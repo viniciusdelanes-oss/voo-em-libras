@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Vôo em Libras</a>
+    <button id="sair" class="btn-primary">Sair</button>
+  </header>
+
+  <main class="section">
+    <div class="section-heading">
+      <h1>Painel administrativo</h1>
+      <p id="mensagem">Verificando acesso...</p>
+    </div>
+
+    <div id="painel" hidden>
+      <h2>Bem-vinda à administração!</h2>
+      <p>Aqui ficará o gerenciamento da plataforma.</p>
+
+      <div class="plans-grid">
+        <article class="plan-card">
+          <h3>Cursos</h3>
+          <p>Cadastrar e organizar os cursos.</p>
+        </article>
+
+        <article class="plan-card">
+          <h3>Aulas e módulos</h3>
+          <p>Organizar videoaulas e materiais.</p>
+        </article>
+
+        <article class="plan-card">
+          <h3>Alunos</h3>
+          <p>Acompanhar os alunos e suas assinaturas.</p>
+        </article>
+
+        <article class="plan-card">
+          <h3>Encontros ao vivo</h3>
+          <p>Agendar e divulgar encontros.</p>
+        </article>
+
+        <article class="plan-card">
+          <h3>Avisos</h3>
+          <p>Publicar comunicados para os alunos.</p>
+        </article>
+
+        <article class="plan-card">
+          <h3>Planos</h3>
+          <p>Consultar os planos disponíveis.</p>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <script>
+    async function verificarAdministrador() {
+      const mensagem = document.getElementById('mensagem');
+      const painel = document.getElementById('painel');
+
+      const { data: { user }, error } =
+        await supabaseClient.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const { data: perfil, error: erroPerfil } =
+        await supabaseClient
+          .from('profiles')
+          .select('role, full_name')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (erroPerfil || !perfil || perfil.role !== 'admin') {
+        mensagem.textContent = 'Acesso restrito à administração.';
+        return;
+      }
+
+      mensagem.textContent =
+        'Olá, ' + (perfil.full_name || user.email) + '!';
+
+      painel.hidden = false;
+    }
+
+    document.getElementById('sair').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+
+    verificarAdministrador();
+  </script>
+
+</body>
+</html>
