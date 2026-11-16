@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Vôo em Libras</a>
+    <a href="index.html">Voltar ao início</a>
+  </header>
+
+  <main class="section">
+    <div class="section-heading">
+      <h1>Bem-vindo(a) de volta!</h1>
+      <p>Entre na sua conta para acessar seus cursos.</p>
+    </div>
+
+    <form id="login-form" class="login-form">
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email"
+        placeholder="Seu e-mail" required>
+
+      <label for="password">Senha</label>
+      <input id="password" name="password" type="password"
+        placeholder="Sua senha" required>
+
+      <button type="submit" class="btn-primary">
+        Entrar
+      </button>
+
+      <p id="login-message"></p>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const message = document.getElementById('login-message');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      message.textContent = 'Verificando acesso...';
+
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        message.textContent = 'Não foi possível entrar. Confira seu e-mail e senha.';
+        console.error(error);
+        return;
+      }
+
+      window.location.href = 'aluno.html';
+    });
+  </script>
+
+</body>
+</html>
