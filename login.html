@@ -62,7 +62,17 @@
         return;
       }
 
-      window.location.href = 'aluno.html';
+     const { data: perfil } = await supabaseClient
+  .from('profiles')
+  .select('role')
+  .eq('id', data.user.id)
+  .maybeSingle();
+
+if (perfil?.role === 'admin') {
+  window.location.href = 'admin.html';
+} else {
+  window.location.href = 'aluno.html';
+}
     });
   </script>
 
