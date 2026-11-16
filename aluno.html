@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Aluno | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Vôo em Libras</a>
+    <button id="sair" class="btn-primary">Sair</button>
+  </header>
+
+  <main class="section">
+    <div class="section-heading">
+      <h1>Minha área de aprendizagem</h1>
+      <p id="boas-vindas">Carregando sua conta...</p>
+    </div>
+
+    <section>
+      <h2>Meus cursos</h2>
+      <div id="cursos-container">
+        <p>Carregando cursos...</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Próximos encontros ao vivo</h2>
+      <div id="encontros-container">
+        <p>Carregando encontros...</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <script>
+    async function iniciarAreaAluno() {
+      const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const { data: perfil } = await supabaseClient
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      document.getElementById('boas-vindas').textContent =
+        'Olá, ' + (perfil?.full_name || user.email) + '!';
+
+      const { data: matriculas, error: erroMatriculas } = await supabaseClient
+        .from('subscriptions')
+        .select('status, current_period_end, plan_id')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      const cursosContainer = document.getElementById('cursos-container');
+
+      if (erroMatriculas) {
+        cursosContainer.textContent = 'Não foi possível carregar seus cursos.';
+        console.error(erroMatriculas);
+      } else if (!matriculas || matriculas.length === 0) {
+        cursosContainer.textContent =
+          'Você ainda não possui uma assinatura ativa. Entre em contato para conhecer os planos.';
+      } else {
+        const planos = [...new Set(matriculas.map(item => item.plan_id))];
+
+        const { data: cursos, error: erroCursos } = await supabaseClient
+          .from('plan_courses')
+          .select('course_id, courses(id, title, description)')
+          .in('plan_id', planos);
+
+        if (erroCursos) {
+          cursosContainer.textContent = 'Não foi possível carregar os cursos.';
+          console.error(erroCursos);
+        } else {
+          const lista = (cursos || [])
+            .map(item => item.courses)
+            .filter(Boolean);
+
+          cursosContainer.innerHTML = lista.length
+            ? lista.map(curso => `
+                <article class="plan-card">
+                  <h3>${escaparHTML(curso.title)}</h3>
+                  <p>${escaparHTML(curso.description || '')}</p>
+                </article>
+              `).join('')
+            : '<p>Nenhum curso disponível para seu plano ainda.</p>';
+        }
+      }
+
+      carregarEncontros();
+    }
+
+    function escaparHTML(valor) {
+      return String(valor).replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[caractere]);
+    }
+
+    async function carregarEncontros() {
+      const container = document.getElementById('encontros-container');
+
+      const { data, error } = await supabaseClient
+        .from('live_sessions')
+        .select('title, description, starts_at, meeting_url')
+        .eq('published', true)
+        .order('starts_at');
+
+      if (error) {
+        container.textContent = 'Não foi possível carregar os encontros.';
+        console.error(error);
+        return;
+      }
+
+      container.innerHTML = data.length
+        ? data.map(encontro => `
+            <article class="plan-card">
+              <h3>${escaparHTML(encontro.title)}</h3>
+              <p>${escaparHTML(encontro.description || '')}</p>
+              <p>${new Date(encontro.starts_at).toLocaleString('pt-BR')}</p>
+              ${encontro.meeting_url
+                ? `<a href="${escaparHTML(encontro.meeting_url)}" target="_blank" rel="noopener noreferrer">Acessar encontro</a>`
+                : ''}
+            </article>
+          `).join('')
+        : '<p>Nenhum encontro agendado no momento.</p>';
+    }
+
+    document.getElementById('sair').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+
+    iniciarAreaAluno();
+  </script>
+
+</body>
+</html>
