@@ -6,99 +6,343 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Administrativo | Vôo em Libras</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-area { max-width: 1100px; margin: auto; }
+    .admin-menu { display: flex; flex-wrap: wrap; gap: 12px; margin: 25px 0; }
+    .admin-menu button, .admin-actions button {
+      cursor: pointer; padding: 12px 18px; border: 0;
+      border-radius: 8px; background: #e8e8e8;
+    }
+    .admin-menu button.active { background: #253b70; color: white; }
+    .admin-section { margin-top: 25px; }
+    .admin-form {
+      display: grid; gap: 12px; max-width: 650px;
+      padding: 22px; border-radius: 12px;
+      background: #f5f5f5; margin: 20px 0;
+    }
+    .admin-form input, .admin-form textarea, .admin-form select {
+      width: 100%; padding: 12px; border: 1px solid #ccc;
+      border-radius: 7px; font: inherit;
+    }
+    .admin-form textarea { min-height: 100px; }
+    .course-row {
+      background: #f5f5f5; padding: 18px; margin: 12px 0;
+      border-radius: 10px;
+    }
+    .course-row img {
+      width: 100px; height: 70px; object-fit: cover;
+      border-radius: 7px;
+    }
+    .course-row-header {
+      display: flex; align-items: center; gap: 15px;
+    }
+    .admin-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .admin-actions .delete { background: #f3dada; }
+    .status { margin: 12px 0; }
+    [hidden] { display: none !important; }
+  </style>
 </head>
 <body>
 
-  <header class="site-header">
-    <a href="index.html" class="logo">Vôo em Libras</a>
-    <button id="sair" class="btn-primary">Sair</button>
-  </header>
+<header class="site-header">
+  <a href="index.html" class="logo">Vôo em Libras</a>
+  <button id="sair" class="btn-primary">Sair</button>
+</header>
 
-  <main class="section">
-    <div class="section-heading">
-      <h1>Painel administrativo</h1>
-      <p id="mensagem">Verificando acesso...</p>
-    </div>
+<main class="section admin-area">
+  <div class="section-heading">
+    <h1>Painel administrativo</h1>
+    <p id="mensagem">Verificando acesso...</p>
+  </div>
 
-    <div id="painel" hidden>
-      <h2>Bem-vinda à administração!</h2>
-      <p>Aqui ficará o gerenciamento da plataforma.</p>
+  <div id="painel" hidden>
+    <h2>Bem-vinda à administração!</h2>
+    <p>Gerencie os conteúdos da plataforma.</p>
 
-      <div class="plans-grid">
-        <article class="plan-card">
-          <h3>Cursos</h3>
-          <p>Cadastrar e organizar os cursos.</p>
-        </article>
+    <nav class="admin-menu">
+      <button class="active" data-section="cursos">Cursos</button>
+      <button data-section="outros">Outras áreas</button>
+    </nav>
 
-        <article class="plan-card">
-          <h3>Aulas e módulos</h3>
-          <p>Organizar videoaulas e materiais.</p>
-        </article>
+    <section id="sec-cursos" class="admin-section">
+      <h2>Gerenciamento de cursos</h2>
+      <p>Cadastre, edite e publique os cursos da plataforma.</p>
 
-        <article class="plan-card">
-          <h3>Alunos</h3>
-          <p>Acompanhar os alunos e suas assinaturas.</p>
-        </article>
+      <button id="novo-curso" class="btn-primary">+ Novo curso</button>
 
-        <article class="plan-card">
-          <h3>Encontros ao vivo</h3>
-          <p>Agendar e divulgar encontros.</p>
-        </article>
+      <form id="form-curso" class="admin-form" hidden>
+        <h3 id="titulo-form">Cadastrar curso</h3>
 
-        <article class="plan-card">
-          <h3>Avisos</h3>
-          <p>Publicar comunicados para os alunos.</p>
-        </article>
+        <input type="hidden" id="curso-id">
 
-        <article class="plan-card">
-          <h3>Planos</h3>
-          <p>Consultar os planos disponíveis.</p>
-        </article>
-      </div>
-    </div>
-  </main>
+        <label>
+          Nome do curso *
+          <input id="titulo" maxlength="150" required>
+        </label>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+        <label>
+          Descrição
+          <textarea id="descricao"></textarea>
+        </label>
 
-  <script>
-    async function verificarAdministrador() {
-      const mensagem = document.getElementById('mensagem');
-      const painel = document.getElementById('painel');
+        <label>
+          Nível
+          <select id="nivel">
+            <option value="">Selecione</option>
+            <option value="Iniciante">Iniciante</option>
+            <option value="Básico">Básico</option>
+            <option value="Intermediário">Intermediário</option>
+            <option value="Avançado">Avançado</option>
+          </select>
+        </label>
 
-      const { data: { user }, error } =
-        await supabaseClient.auth.getUser();
+        <label>
+          Carga horária (horas)
+          <input id="carga" type="number" min="0" step="1">
+        </label>
 
-      if (error || !user) {
-        window.location.href = 'login.html';
-        return;
-      }
+        <label>
+          Endereço da imagem de capa
+          <input id="capa" type="url" placeholder="https://...">
+        </label>
 
-      const { data: perfil, error: erroPerfil } =
-        await supabaseClient
-          .from('profiles')
-          .select('role, full_name')
-          .eq('id', user.id)
-          .maybeSingle();
+        <label>
+          <input id="publicado" type="checkbox" style="width:auto">
+          Publicar curso
+        </label>
 
-      if (erroPerfil || !perfil || perfil.role !== 'admin') {
-        mensagem.textContent = 'Acesso restrito à administração.';
-        return;
-      }
+        <div class="admin-actions">
+          <button type="submit" class="btn-primary">Salvar curso</button>
+          <button type="button" id="cancelar">Cancelar</button>
+        </div>
+      </form>
 
-      mensagem.textContent =
-        'Olá, ' + (perfil.full_name || user.email) + '!';
+      <p id="status-cursos" class="status" aria-live="polite"></p>
+      <div id="lista-cursos"></div>
+    </section>
 
-      painel.hidden = false;
+    <section id="sec-outros" class="admin-section" hidden>
+      <h2>Outras áreas administrativas</h2>
+      <p>Em breve: módulos, aulas, alunos, encontros ao vivo, avisos e planos.</p>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function slugificar(texto) {
+  return texto.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function escapar(texto) {
+  return String(texto ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;',
+    '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+async function verificarAdministrador() {
+  const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+  if (error || !user) {
+    location.href = 'login.html';
+    return;
+  }
+
+  const { data: perfil, error: erroPerfil } = await supabaseClient
+    .from('profiles')
+    .select('role, full_name')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (erroPerfil || !perfil || perfil.role !== 'admin') {
+    $('mensagem').textContent = 'Acesso restrito à administração.';
+    return;
+  }
+
+  $('mensagem').textContent = 'Olá, ' + (perfil.full_name || user.email) + '!';
+  $('painel').hidden = false;
+  carregarCursos();
+}
+
+async function carregarCursos() {
+  const lista = $('lista-cursos');
+  $('status-cursos').textContent = 'Carregando cursos...';
+
+  const { data, error } = await supabaseClient
+    .from('courses')
+    .select('id, title, slug, description, cover_url, level, workload_hours, published, sort_order')
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    $('status-cursos').textContent = 'Erro ao carregar cursos: ' + error.message;
+    return;
+  }
+
+  lista.innerHTML = '';
+
+  if (!data || !data.length) {
+    lista.innerHTML = '<p>Nenhum curso cadastrado ainda.</p>';
+  } else {
+    data.forEach(curso => {
+      const item = document.createElement('article');
+      item.className = 'course-row';
+      const imagem = curso.cover_url
+        ? `<img src="${escapar(curso.cover_url)}" alt="">`
+        : '';
+
+      item.innerHTML = `
+        <div class="course-row-header">
+          ${imagem}
+          <div>
+            <h3>${escapar(curso.title)}</h3>
+            <p>${curso.published ? 'Publicado' : 'Rascunho'}</p>
+            <p>${escapar(curso.level || 'Nível não definido')}</p>
+          </div>
+        </div>
+        <div class="admin-actions">
+          <button type="button" data-edit="${escapar(curso.id)}">Editar</button>
+          <button type="button" class="delete" data-delete="${escapar(curso.id)}">Excluir</button>
+        </div>
+      `;
+      lista.appendChild(item);
+    });
+  }
+
+  $('status-cursos').textContent = '';
+}
+
+function limparFormulario() {
+  $('form-curso').reset();
+  $('curso-id').value = '';
+  $('titulo-form').textContent = 'Cadastrar curso';
+  $('form-curso').hidden = true;
+}
+
+$('novo-curso').addEventListener('click', () => {
+  limparFormulario();
+  $('form-curso').hidden = false;
+  $('titulo').focus();
+});
+
+$('cancelar').addEventListener('click', limparFormulario);
+
+$('form-curso').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const id = $('curso-id').value;
+  const titulo = $('titulo').value.trim();
+
+  if (!titulo) return;
+
+  const registro = {
+    title: titulo,
+    slug: slugificar(titulo),
+    description: $('descricao').value.trim() || null,
+    level: $('nivel').value || null,
+    workload_hours: $('carga').value ? Number($('carga').value) : null,
+    cover_url: $('capa').value.trim() || null,
+    published: $('publicado').checked
+  };
+
+  $('status-cursos').textContent = 'Salvando curso...';
+
+  let resultado;
+
+  if (id) {
+    resultado = await supabaseClient
+      .from('courses')
+      .update(registro)
+      .eq('id', id);
+  } else {
+    resultado = await supabaseClient
+      .from('courses')
+      .insert(registro);
+  }
+
+  if (resultado.error) {
+    $('status-cursos').textContent = 'Erro ao salvar: ' + resultado.error.message;
+    return;
+  }
+
+  limparFormulario();
+  $('status-cursos').textContent = 'Curso salvo com sucesso!';
+  carregarCursos();
+});
+
+$('lista-cursos').addEventListener('click', async event => {
+  const editar = event.target.closest('[data-edit]');
+  const excluir = event.target.closest('[data-delete]');
+
+  if (editar) {
+    const { data, error } = await supabaseClient
+      .from('courses')
+      .select('*')
+      .eq('id', editar.dataset.edit)
+      .single();
+
+    if (error) {
+      $('status-cursos').textContent = 'Erro ao abrir curso: ' + error.message;
+      return;
     }
 
-    document.getElementById('sair').addEventListener('click', async () => {
-      await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
-    });
+    $('curso-id').value = data.id;
+    $('titulo').value = data.title || '';
+    $('descricao').value = data.description || '';
+    $('nivel').value = data.level || '';
+    $('carga').value = data.workload_hours ?? '';
+    $('capa').value = data.cover_url || '';
+    $('publicado').checked = !!data.published;
+    $('titulo-form').textContent = 'Editar curso';
+    $('form-curso').hidden = false;
+    $('titulo').focus();
+  }
 
-    verificarAdministrador();
-  </script>
+  if (excluir) {
+    if (!confirm('Tem certeza que deseja excluir este curso?')) return;
 
+    const { error } = await supabaseClient
+      .from('courses')
+      .delete()
+      .eq('id', excluir.dataset.delete);
+
+    if (error) {
+      $('status-cursos').textContent = 'Erro ao excluir: ' + error.message;
+      return;
+    }
+
+    $('status-cursos').textContent = 'Curso excluído.';
+    carregarCursos();
+  }
+});
+
+document.querySelectorAll('[data-section]').forEach(botao => {
+  botao.addEventListener('click', () => {
+    const secao = botao.dataset.section;
+    $('sec-cursos').hidden = secao !== 'cursos';
+    $('sec-outros').hidden = secao !== 'outros';
+
+    document.querySelectorAll('[data-section]').forEach(b =>
+      b.classList.toggle('active', b === botao)
+    );
+  });
+});
+
+$('sair').addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  location.href = 'login.html';
+});
+
+verificarAdministrador();
+</script>
 </body>
 </html>
