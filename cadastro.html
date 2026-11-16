@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">Vôo em Libras</a>
+    <a href="index.html">Voltar ao início</a>
+  </header>
+
+  <main class="section">
+    <div class="section-heading">
+      <h1>Crie sua conta</h1>
+      <p>Comece sua jornada de aprendizagem em Libras!</p>
+    </div>
+
+    <form id="cadastro-form" class="login-form">
+      <label for="nome">Nome completo</label>
+      <input id="nome" type="text" required
+        placeholder="Digite seu nome">
+
+      <label for="email">E-mail</label>
+      <input id="email" type="email" required
+        placeholder="Seu melhor e-mail">
+
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" minlength="10"
+        required placeholder="Mínimo de 10 caracteres">
+
+      <button type="submit" class="btn-primary">
+        Criar minha conta
+      </button>
+
+      <p id="mensagem"></p>
+
+      <p>Já possui uma conta? <a href="login.html">Entrar</a></p>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <script>
+    const form = document.getElementById('cadastro-form');
+    const mensagem = document.getElementById('mensagem');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      mensagem.textContent = 'Criando sua conta...';
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            full_name: nome
+          }
+        }
+      });
+
+      if (error) {
+        mensagem.textContent = 'Não foi possível criar a conta: ' + error.message;
+        return;
+      }
+
+      mensagem.textContent = data.session
+        ? 'Conta criada! Você já pode entrar.'
+        : 'Cadastro realizado! Confira seu e-mail para confirmar a conta.';
+    });
+  </script>
+
+</body>
+</html>
