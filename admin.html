@@ -68,6 +68,7 @@
       <button data-section="modulos">Módulos</button>
       <button data-section="aulas">Aulas</button>
       <button data-section="materiais">Materiais</button>
+      <button data-section="solicitacoes">Solicitações</button>
     </nav>
 
     <!-- CURSOS -->
@@ -261,7 +262,20 @@
       <p id="status-materiais" class="status" aria-live="polite"></p>
       <div id="lista-materiais"></div>
     </section>
+<!-- SOLICITAÇÕES DE PLANOS -->
 
+<section id="sec-solicitacoes" class="admin-section" hidden>
+  <h2>Solicitações de planos</h2>
+  <p>Pedidos de alunos aguardando confirmação de pagamento.</p>
+
+  <button type="button" class="btn-primary"
+    onclick="carregarSolicitacoes()">
+    Atualizar solicitações
+  </button>
+
+  <p id="status-solicitacoes" class="status"></p>
+  <div id="lista-solicitacoes"></div>
+</section>
   </div>
 </main>
 
