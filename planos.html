@@ -107,32 +107,47 @@
       `).join('');
     }
 
-    async function escolherPlano(id) {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+   
+async function escolherPlano(id) {
+  const { data: { user }, error: erroLogin } =
+    await supabaseClient.auth.getUser();
 
-      if (!user) {
-        alert('Faça login ou crie sua conta para escolher um plano.');
-        window.location.href = 'index.html';
-        return;
-      }
+  if (erroLogin || !user) {
+    alert('Faça login ou crie sua conta para escolher um plano.');
+    window.location.href = 'index.html';
+    return;
+  }
 
-      const { data: plano, error } = await supabaseClient
-        .from('plans')
-        .select('id, name')
-        .eq('id', id)
-        .eq('active', true)
-        .maybeSingle();
+  const { data: plano, error: erroPlano } = await supabaseClient
+    .from('plans')
+    .select('id, name')
+    .eq('id', id)
+    .eq('active', true)
+    .maybeSingle();
 
-      if (error || !plano) {
-        alert('Não foi possível localizar este plano.');
-        return;
-      }
+  if (erroPlano || !plano) {
+    alert('Não foi possível localizar este plano.');
+    return;
+  }
 
-      alert('Você escolheu o ' + plano.name +
-        '. A próxima etapa será configurar o pagamento.');
-    }
+  const { error: erroPedido } = await supabaseClient
+    .from('plan_requests')
+    .insert({
+      user_id: user.id,
+      plan_id: plano.id,
+      status: 'pending'
+    });
 
-    carregarPlanos();
-  </script>
-</body>
-</html>
+  if (erroPedido) {
+    alert('Erro ao registrar solicitação: ' + erroPedido.message);
+    return;
+  }
+
+  alert(
+    'Solicitação registrada com sucesso!\n\n' +
+    'Plano escolhido: ' + plano.name +
+    '\n\nAguarde nosso contato com as instruções para pagamento via Pix. ' +
+    'O acesso será liberado após a confirmação do pagamento.'
+  );
+}
+
