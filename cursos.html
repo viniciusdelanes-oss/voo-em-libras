@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus cursos | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .cursos-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .cursos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 22px;
+    }
+    .curso-card {
+      padding: 22px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 3px 14px #00000012;
+    }
+    .curso-card h2 { margin-top: 0; }
+    .curso-card button {
+      padding: 11px 18px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #3157a4;
+      color: white;
+    }
+    .mensagem { padding: 20px; }
+  </style>
+</head>
+<body>
+  <main class="cursos-container">
+    <h1>Meus cursos</h1>
+    <p>Escolha um curso para começar a aprender Libras.</p>
+    <div id="mensagem" class="mensagem">Carregando cursos...</div>
+    <div id="lista-cursos" class="cursos-grid"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    const lista = document.getElementById('lista-cursos');
+    const mensagem = document.getElementById('mensagem');
+
+    function escapar(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;',
+        '"': '&quot;', "'": '&#39;'
+      })[caractere]);
+    }
+
+    async function carregarCursos() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        mensagem.textContent = 'Faça login para acessar seus cursos.';
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from('courses')
+        .select('id, title, description, level, workload_hours')
+        .eq('published', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        mensagem.textContent = 'Não foi possível carregar os cursos: ' + error.message;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        mensagem.textContent = 'Ainda não há cursos publicados.';
+        return;
+      }
+
+      mensagem.textContent = '';
+
+      lista.innerHTML = data.map(curso => `
+        <article class="curso-card">
+          <h2>${escapar(curso.title)}</h2>
+          <p>${escapar(curso.description || 'Conheça este curso.')}</p>
+          ${curso.level ? `<p>Nível: ${escapar(curso.level)}</p>` : ''}
+          ${curso.workload_hours ? `<p>Carga horária: ${escapar(curso.workload_hours)} horas</p>` : ''}
+          <button type="button" onclick="abrirCurso('${escapar(curso.id)}')">
+            Acessar curso
+          </button>
+        </article>
+      `).join('');
+    }
+
+    function abrirCurso(id) {
+      window.location.href = 'curso.html?id=' + encodeURIComponent(id);
+    }
+
+    carregarCursos();
+  </script>
+</body>
+</html>
