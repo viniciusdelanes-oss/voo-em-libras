@@ -440,7 +440,29 @@ footer p {
   background: #f7f2fc;
 }
 
+
 .professora-card {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: flex-start;
+  margin-top: 35px;
+  padding: 35px;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 10px 35px rgba(80, 56, 121, 0.10);
+}
+
+.professora-foto {
+  flex: 0 0 320px;
+  width: 320px;
+}
+
+.professora-info {
+  flex: 1;
+  min-width: 0;
+}
+
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 40px;
