@@ -29,9 +29,7 @@
       box-shadow: 0 4px 18px #00000012;
     }
 
-    .plano-card h2 {
-      color: #3157a4;
-    }
+    .plano-card h2 { color: #3157a4; }
 
     .preco {
       font-size: 25px;
@@ -50,18 +48,8 @@
       margin-top: 10px;
     }
 
-    .plano-card button:hover {
-      opacity: 0.9;
-    }
-
-    .mensagem {
-      padding: 20px;
-    }
-
-    .modalidade {
-      margin-top: 20px;
-      font-weight: bold;
-    }
+    .mensagem { padding: 20px; }
+    .modalidade { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 
@@ -74,10 +62,7 @@
       Você também terá acesso aos materiais de apoio na área do aluno.
     </p>
 
-    <div id="mensagem" class="mensagem">
-      Carregando níveis...
-    </div>
-
+    <div id="mensagem" class="mensagem">Carregando níveis...</div>
     <div id="lista-planos" class="planos-grid"></div>
   </main>
 
@@ -96,6 +81,33 @@
         '"': '&quot;',
         "'": '&#39;'
       })[c]);
+    }
+
+    function obterPrecos(nome) {
+      const nivel = String(nome || '').normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+      if (nivel.includes('basico')) {
+        return { individual: 130, grupo: 95 };
+      }
+
+      if (nivel.includes('intermediario')) {
+        return { individual: 160, grupo: 110 };
+      }
+
+      if (nivel.includes('avancado')) {
+        return { individual: 190, grupo: 120 };
+      }
+
+      return null;
+    }
+
+    function formatarPreco(valor) {
+      return Number(valor).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
     }
 
     async function carregarPlanos() {
@@ -117,36 +129,47 @@
 
       mensagem.textContent = '';
 
-      lista.innerHTML = data.map(plano => `
-        <article class="plano-card">
-          <h2>${escapar(plano.name)}</h2>
+      lista.innerHTML = data.map(plano => {
+        const precos = obterPrecos(plano.name);
 
-          <p>${escapar(plano.description || 'Curso de Libras com aulas presenciais e materiais de apoio.')}</p>
+        if (!precos) {
+          return `
+            <article class="plano-card">
+              <h2>${escapar(plano.name)}</h2>
+              <p>Preço ainda não configurado para este nível.</p>
+            </article>
+          `;
+        }
 
-          <div class="modalidade">Aula individual</div>
-          <div class="preco">R$ 150,00/mês</div>
+        return `
+          <article class="plano-card">
+            <h2>${escapar(plano.name)}</h2>
 
-          <button type="button"
-            onclick="escolherPlano('${escapar(plano.id)}', 'individual')">
-            Escolher individual
-          </button>
+            <p>${escapar(plano.description || 'Curso de Libras com aulas presenciais e materiais de apoio.')}</p>
 
-          <div class="modalidade">Aula em grupo</div>
-          <div class="preco">R$ 100,00/mês por aluno</div>
+            <div class="modalidade">Aula individual</div>
+            <div class="preco">${formatarPreco(precos.individual)}/mês</div>
 
-          <button type="button"
-            onclick="escolherPlano('${escapar(plano.id)}', 'grupo')">
-            Escolher em grupo
-          </button>
-        </article>
-      `).join('');
+            <button type="button"
+              onclick="escolherPlano('${escapar(plano.id)}', 'individual')">
+              Escolher individual
+            </button>
+
+            <div class="modalidade">Aula em grupo</div>
+            <div class="preco">${formatarPreco(precos.grupo)}/mês por aluno</div>
+
+            <button type="button"
+              onclick="escolherPlano('${escapar(plano.id)}', 'grupo')">
+              Escolher em grupo
+            </button>
+          </article>
+        `;
+      }).join('');
     }
 
     async function escolherPlano(id, modalidade) {
-      const {
-        data: { user },
-        error: erroLogin
-      } = await supabaseClient.auth.getUser();
+      const { data: { user }, error: erroLogin } =
+        await supabaseClient.auth.getUser();
 
       if (erroLogin || !user) {
         alert('Faça login ou crie sua conta para solicitar a matrícula.');
@@ -166,13 +189,20 @@
         return;
       }
 
-      const valor = modalidade === 'individual' ? 150 : 100;
+      const precos = obterPrecos(plano.name);
+
+      if (!precos) {
+        alert('Nível sem preço configurado. Entre em contato conosco.');
+        return;
+      }
+
+      const valor = precos[modalidade];
 
       const confirmar = confirm(
         'Confirme sua matrícula:\n\n' +
         'Nível: ' + plano.name + '\n' +
         'Modalidade: ' + (modalidade === 'individual' ? 'Individual' : 'Em grupo') + '\n' +
-        'Mensalidade: R$ ' + valor.toFixed(2).replace('.', ',') +
+        'Mensalidade: ' + formatarPreco(valor) +
         '\n\nDeseja enviar a solicitação?'
       );
 
@@ -197,7 +227,7 @@
         'Solicitação de matrícula registrada!\n\n' +
         'Nível: ' + plano.name +
         '\nModalidade: ' + (modalidade === 'individual' ? 'Individual' : 'Em grupo') +
-        '\nMensalidade: R$ ' + valor.toFixed(2).replace('.', ',') +
+        '\nMensalidade: ' + formatarPreco(valor) +
         '\n\nAguarde as instruções para pagamento via Pix. ' +
         'O acesso será liberado após a confirmação.'
       );
