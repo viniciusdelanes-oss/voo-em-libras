@@ -904,3 +904,43 @@ footer p {
   }
 }
 
+/* CORREÇÃO DO TEXTO DA PROFESSORA NO CELULAR */
+@media (max-width: 850px) {
+
+  .professora-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    padding: 20px;
+    gap: 25px;
+  }
+
+  .professora-info {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
+    overflow-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+  }
+
+  .professora-info p,
+  .professora-info h3,
+  .professora-info h4,
+  .professora-info li {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.7;
+  }
+
+  .professora-info ul {
+    padding-left: 20px;
+  }
+}
+
