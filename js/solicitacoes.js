@@ -29,14 +29,20 @@ async function carregarSolicitacoes() {
     cartao.className = 'item';
 
     const titulo = document.createElement('h3');
-    titulo.textContent = pedido.plano;
+    titulo.textContent = 'Nível: ' + pedido.plano;
 
     const email = document.createElement('p');
     email.textContent = 'Aluno: ' + pedido.aluno_email;
 
+    const modalidade = document.createElement('p');
+    modalidade.textContent =
+      'Modalidade: ' +
+      (pedido.modalidade === 'individual' ? 'Individual' :
+       pedido.modalidade === 'grupo' ? 'Em grupo' : 'Não informada');
+
     const valor = document.createElement('p');
-    valor.textContent = 'Valor: R$ ' +
-      (Number(pedido.price_cents || 0) / 100)
+    valor.textContent = 'Mensalidade: R$ ' +
+      Number(pedido.valor_mensal || 0)
         .toFixed(2).replace('.', ',');
 
     const situacao = document.createElement('p');
@@ -46,7 +52,14 @@ async function carregarSolicitacoes() {
     dataPedido.textContent = 'Solicitado em: ' +
       new Date(pedido.created_at).toLocaleString('pt-BR');
 
-    cartao.append(titulo, email, valor, situacao, dataPedido);
+    cartao.append(
+      titulo,
+      email,
+      modalidade,
+      valor,
+      situacao,
+      dataPedido
+    );
 
     if (pedido.status === 'pending') {
       const botao = document.createElement('button');
