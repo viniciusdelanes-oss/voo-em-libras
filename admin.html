@@ -2,46 +2,48 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo | Vôo em Libras</title>
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    .admin-area { max-width: 1100px; margin: auto; }
-    .admin-menu { display: flex; flex-wrap: wrap; gap: 12px; margin: 25px 0; }
-    .admin-menu button, .admin-actions button {
-      cursor: pointer; padding: 12px 18px; border: 0;
-      border-radius: 8px; background: #e8e8e8;
-    }
-    .admin-menu button.active { background: #253b70; color: white; }
-    .admin-section { margin-top: 25px; }
-    .admin-form {
-      display: grid; gap: 12px; max-width: 650px;
-      padding: 22px; border-radius: 12px;
-      background: #f5f5f5; margin: 20px 0;
-    }
-    .admin-form input, .admin-form textarea, .admin-form select {
-      width: 100%; padding: 12px; border: 1px solid #ccc;
-      border-radius: 7px; font: inherit;
-    }
-    .admin-form textarea { min-height: 100px; }
-    .course-row {
-      background: #f5f5f5; padding: 18px; margin: 12px 0;
-      border-radius: 10px;
-    }
-    .course-row img {
-      width: 100px; height: 70px; object-fit: cover;
-      border-radius: 7px;
-    }
-    .course-row-header {
-      display: flex; align-items: center; gap: 15px;
-    }
-    .admin-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .admin-actions .delete { background: #f3dada; }
-    .status { margin: 12px 0; }
-    [hidden] { display: none !important; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo | Vôo em Libras</title>
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+.admin-area {max-width:1100px;margin:auto}
+.admin-menu {display:flex;flex-wrap:wrap;gap:10px;margin:25px 0}
+.admin-menu button,.actions button {
+  padding:11px 16px;border:0;border-radius:8px;
+  cursor:pointer;background:#e8e8e8;font:inherit
+}
+.admin-menu button.active {background:#253b70;color:white}
+.admin-section {margin-top:25px}
+.admin-form {
+  display:grid;gap:13px;max-width:680px;
+  padding:22px;background:#f5f5f5;
+  border-radius:12px;margin:20px 0
+}
+.admin-form input:not([type=checkbox]),
+.admin-form textarea,.admin-form select {
+  width:100%;padding:12px;border:1px solid #ccc;
+  border-radius:7px;font:inherit;margin-top:6px
+}
+.admin-form textarea {min-height:85px}
+.admin-form label {display:block}
+.admin-form input[type=checkbox] {width:auto}
+.actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.actions .danger {background:#f3dada}
+.item {
+  background:#f5f5f5;padding:18px;
+  border-radius:10px;margin:12px 0
+}
+.item h3 {margin-top:0}
+.item p {overflow-wrap:anywhere}
+.status {margin:12px 0;min-height:20px}
+.primary {background:#253b70!important;color:white!important}
+.secondary {background:#e8e8e8!important;color:#222!important}
+[hidden] {display:none!important}
+</style>
 </head>
+
 <body>
 
 <header class="site-header">
@@ -50,70 +52,70 @@
 </header>
 
 <main class="section admin-area">
+
   <div class="section-heading">
     <h1>Painel administrativo</h1>
     <p id="mensagem">Verificando acesso...</p>
   </div>
 
   <div id="painel" hidden>
-    <h2>Bem-vinda à administração!</h2>
-    <p>Gerencie os conteúdos da plataforma.</p>
+
+    <h2>Gerenciamento da plataforma</h2>
+    <p>Bem-vinda à administração do Vôo em Libras!</p>
 
     <nav class="admin-menu">
       <button class="active" data-section="cursos">Cursos</button>
-      <button data-section="outros">Outras áreas</button>
+      <button data-section="modulos">Módulos</button>
+      <button data-section="aulas">Aulas</button>
+      <button data-section="materiais">Materiais</button>
     </nav>
 
+    <!-- CURSOS -->
+
     <section id="sec-cursos" class="admin-section">
-      <h2>Gerenciamento de cursos</h2>
-      <p>Cadastre, edite e publique os cursos da plataforma.</p>
+
+      <h2>Cursos</h2>
+      <p>Cadastre e organize os cursos da plataforma.</p>
 
       <button id="novo-curso" class="btn-primary">+ Novo curso</button>
 
       <form id="form-curso" class="admin-form" hidden>
-        <h3 id="titulo-form">Cadastrar curso</h3>
+        <h3 id="titulo-form-curso">Cadastrar curso</h3>
 
         <input type="hidden" id="curso-id">
 
-        <label>
-          Nome do curso *
-          <input id="titulo" maxlength="150" required>
+        <label>Nome do curso *
+          <input id="curso-titulo" required maxlength="150">
+        </label>
+
+        <label>Descrição
+          <textarea id="curso-descricao"></textarea>
+        </label>
+
+        <label>Nível
+          <input id="curso-nivel" placeholder="Iniciante, intermediário...">
+        </label>
+
+        <label>Carga horária
+          <input id="curso-carga" type="number" min="0">
+        </label>
+
+        <label>Endereço da imagem de capa
+          <input id="curso-capa" type="url" placeholder="https://...">
+        </label>
+
+        <label>Ordem de exibição
+          <input id="curso-ordem" type="number" value="0">
         </label>
 
         <label>
-          Descrição
-          <textarea id="descricao"></textarea>
-        </label>
-
-        <label>
-          Nível
-          <select id="nivel">
-            <option value="">Selecione</option>
-            <option value="Iniciante">Iniciante</option>
-            <option value="Básico">Básico</option>
-            <option value="Intermediário">Intermediário</option>
-            <option value="Avançado">Avançado</option>
-          </select>
-        </label>
-
-        <label>
-          Carga horária (horas)
-          <input id="carga" type="number" min="0" step="1">
-        </label>
-
-        <label>
-          Endereço da imagem de capa
-          <input id="capa" type="url" placeholder="https://...">
-        </label>
-
-        <label>
-          <input id="publicado" type="checkbox" style="width:auto">
+          <input id="curso-publicado" type="checkbox">
           Publicar curso
         </label>
 
-        <div class="admin-actions">
+        <div class="actions">
           <button type="submit" class="btn-primary">Salvar curso</button>
-          <button type="button" id="cancelar">Cancelar</button>
+          <button type="button" class="secondary" data-cancel="curso">Cancelar</button>
         </div>
       </form>
 
@@ -121,10 +123,145 @@
       <div id="lista-cursos"></div>
     </section>
 
-    <section id="sec-outros" class="admin-section" hidden>
-      <h2>Outras áreas administrativas</h2>
-      <p>Em breve: módulos, aulas, alunos, encontros ao vivo, avisos e planos.</p>
+    <!-- MODULOS -->
+
+    <section id="sec-modulos" class="admin-section" hidden>
+
+      <h2>Módulos</h2>
+      <p>Organize os módulos dentro de cada curso.</p>
+
+      <button id="novo-modulo" class="btn-primary">+ Novo módulo</button>
+
+      <form id="form-modulo" class="admin-form" hidden>
+        <h3 id="titulo-form-modulo">Cadastrar módulo</h3>
+
+        <input type="hidden" id="modulo-id">
+
+        <label>Curso *
+          <select id="modulo-curso" required></select>
+        </label>
+
+        <label>Nome do módulo *
+          <input id="modulo-titulo" required>
+        </label>
+
+        <label>Descrição
+          <textarea id="modulo-descricao"></textarea>
+        </label>
+
+        <label>Ordem de exibição
+          <input id="modulo-ordem" type="number" value="0">
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Salvar módulo</button>
+          <button type="button" class="secondary" data-cancel="modulo">Cancelar</button>
+        </div>
+      </form>
+
+      <p id="status-modulos" class="status" aria-live="polite"></p>
+      <div id="lista-modulos"></div>
     </section>
+
+    <!-- AULAS -->
+
+    <section id="sec-aulas" class="admin-section" hidden>
+
+      <h2>Aulas</h2>
+      <p>Cadastre as videoaulas dentro dos módulos.</p>
+
+      <button id="nova-aula" class="btn-primary">+ Nova aula</button>
+
+      <form id="form-aula" class="admin-form" hidden>
+        <h3 id="titulo-form-aula">Cadastrar aula</h3>
+
+        <input type="hidden" id="aula-id">
+
+        <label>Módulo *
+          <select id="aula-modulo" required></select>
+        </label>
+
+        <label>Nome da aula *
+          <input id="aula-titulo" required>
+        </label>
+
+        <label>Descrição
+          <textarea id="aula-descricao"></textarea>
+        </label>
+
+        <label>Link do vídeo
+          <input id="aula-video" type="url" placeholder="https://...">
+        </label>
+
+        <label>Duração em minutos
+          <input id="aula-duracao" type="number" min="0">
+        </label>
+
+        <label>Ordem de exibição
+          <input id="aula-ordem" type="number" value="0">
+        </label>
+
+        <label>
+          <input id="aula-publicada" type="checkbox">
+          Publicar aula
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Salvar aula</button>
+          <button type="button" class="secondary" data-cancel="aula">Cancelar</button>
+        </div>
+      </form>
+
+      <p id="status-aulas" class="status" aria-live="polite"></p>
+      <div id="lista-aulas"></div>
+    </section>
+
+    <!-- MATERIAIS -->
+
+    <section id="sec-materiais" class="admin-section" hidden>
+
+      <h2>Materiais complementares</h2>
+      <p>Adicione apostilas, PDFs, atividades e outros materiais às aulas.</p>
+
+      <button id="novo-material" class="btn-primary">+ Novo material</button>
+
+      <form id="form-material" class="admin-form" hidden>
+        <h3 id="titulo-form-material">Cadastrar material</h3>
+
+        <input type="hidden" id="material-id">
+
+        <label>Aula *
+          <select id="material-aula" required></select>
+        </label>
+
+        <label>Nome do material *
+          <input id="material-titulo" required>
+        </label>
+
+        <label>Endereço do arquivo *
+          <input id="material-url" type="url" required placeholder="https://...">
+        </label>
+
+        <label>Tipo de material
+          <select id="material-tipo">
+            <option value="pdf">PDF</option>
+            <option value="apostila">Apostila</option>
+            <option value="atividade">Atividade</option>
+            <option value="link">Link externo</option>
+            <option value="outro">Outro</option>
+          </select>
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Salvar material</button>
+          <button type="button" class="secondary" data-cancel="material">Cancelar</button>
+        </div>
+      </form>
+
+      <p id="status-materiais" class="status" aria-live="polite"></p>
+      <div id="lista-materiais"></div>
+    </section>
+
   </div>
 </main>
 
@@ -134,34 +271,278 @@
 <script>
 const $ = id => document.getElementById(id);
 
-function slugificar(texto) {
-  return texto.normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
+const estado = {
+  cursos: [],
+  modulos: [],
+  aulas: [],
+  materiais: []
+};
 
-function escapar(texto) {
-  return String(texto ?? '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;',
-    '"': '&quot;', "'": '&#39;'
+function escapar(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
   })[c]);
 }
 
+function slugificar(texto) {
+  return texto.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-|-$/g,'');
+}
+
+function urlSegura(valor) {
+  if (!valor) return '';
+  try {
+    const url = new URL(valor);
+    return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
+function mostrarStatus(area, mensagem) {
+  $('status-' + area).textContent = mensagem;
+}
+
+function opcoes(selectId, itens, texto, valorSelecionado = '') {
+  const select = $(selectId);
+  const anterior = valorSelecionado || select.value;
+
+  select.innerHTML = '<option value="">Selecione</option>';
+
+  itens.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.id;
+    option.textContent = texto(item);
+    select.appendChild(option);
+  });
+
+  if (anterior && itens.some(item => String(item.id) === String(anterior))) {
+    select.value = anterior;
+  }
+}
+
+function fecharFormularios() {
+  ['curso','modulo','aula','material'].forEach(tipo => {
+    $('form-' + tipo).reset();
+    $('form-' + tipo).hidden = true;
+    $(tipo + '-id').value = '';
+  });
+
+  $('curso-ordem').value = 0;
+  $('modulo-ordem').value = 0;
+  $('aula-ordem').value = 0;
+}
+
+async function carregarTudo() {
+  for (const [tabela, chave, ordem] of [
+    ['courses','cursos','sort_order'],
+    ['modules','modulos','sort_order'],
+    ['lessons','aulas','sort_order'],
+    ['lesson_resources','materiais','created_at']
+  ]) {
+    const {data,error} = await supabaseClient
+      .from(tabela)
+      .select('*')
+      .order(ordem, {ascending:true});
+
+    if (error) {
+      mostrarStatus(chave, 'Erro ao carregar: ' + error.message);
+      estado[chave] = [];
+    } else {
+      estado[chave] = data || [];
+    }
+  }
+
+  atualizarOpcoes();
+  renderizarTudo();
+}
+
+function atualizarOpcoes() {
+  opcoes('modulo-curso', estado.cursos, c => c.title);
+  opcoes('aula-modulo', estado.modulos, m => {
+    const curso = estado.cursos.find(c => c.id === m.course_id);
+    return (curso ? curso.title + ' — ' : '') + m.title;
+  });
+  opcoes('material-aula', estado.aulas, a => {
+    const modulo = estado.modulos.find(m => m.id === a.module_id);
+    return (modulo ? modulo.title + ' — ' : '') + a.title;
+  });
+}
+
+function cartao(titulo, descricao, id, tipo) {
+  return `
+    <article class="item">
+      <h3>${escapar(titulo)}</h3>
+      <p>${escapar(descricao || '')}</p>
+      <div class="actions">
+        <button type="button" data-edit="${escapar(id)}" data-type="${tipo}">Editar</button>
+        <button type="button" class="danger" data-delete="${escapar(id)}" data-type="${tipo}">Excluir</button>
+      </div>
+    </article>`;
+}
+
+function renderizarTudo() {
+  $('lista-cursos').innerHTML = estado.cursos.length
+    ? estado.cursos.map(c => cartao(
+        c.title,
+        (c.published ? 'Publicado' : 'Rascunho') +
+        ' | ' + (c.level || 'Nível não definido'),
+        c.id,'curso'
+      )).join('')
+    : '<p>Nenhum curso cadastrado.</p>';
+
+  $('lista-modulos').innerHTML = estado.modulos.length
+    ? estado.modulos.map(m => {
+        const curso = estado.cursos.find(c => c.id === m.course_id);
+        return cartao(m.title,
+          'Curso: ' + (curso ? curso.title : 'Não encontrado') +
+          ' | ' + (m.description || ''),
+          m.id,'modulo');
+      }).join('')
+    : '<p>Nenhum módulo cadastrado.</p>';
+
+  $('lista-aulas').innerHTML = estado.aulas.length
+    ? estado.aulas.map(a => {
+        const modulo = estado.modulos.find(m => m.id === a.module_id);
+        return cartao(a.title,
+          'Módulo: ' + (modulo ? modulo.title : 'Não encontrado') +
+          ' | ' + (a.published ? 'Publicada' : 'Rascunho') +
+          ' | ' + (a.duration_minutes || 0) + ' minutos',
+          a.id,'aula');
+      }).join('')
+    : '<p>Nenhuma aula cadastrada.</p>';
+
+  $('lista-materiais').innerHTML = estado.materiais.length
+    ? estado.materiais.map(r => {
+        const aula = estado.aulas.find(a => a.id === r.lesson_id);
+        return cartao(r.title,
+          'Aula: ' + (aula ? aula.title : 'Não encontrada') +
+          ' | Tipo: ' + (r.resource_type || 'Não definido') +
+          ' | ' + (r.file_url || ''),
+          r.id,'material');
+      }).join('')
+    : '<p>Nenhum material cadastrado.</p>';
+}
+
+async function salvar(tabela, id, dados, area) {
+  mostrarStatus(area, 'Salvando...');
+
+  let resultado;
+
+  if (id) {
+    resultado = await supabaseClient.from(tabela)
+      .update(dados).eq('id', id);
+  } else {
+    resultado = await supabaseClient.from(tabela)
+      .insert(dados);
+  }
+
+  if (resultado.error) {
+    mostrarStatus(area, 'Erro ao salvar: ' + resultado.error.message);
+    return false;
+  }
+
+  fecharFormularios();
+  await carregarTudo();
+  mostrarStatus(area, 'Salvo com sucesso!');
+  return true;
+}
+
+async function excluir(tabela, id, area) {
+  if (!confirm('Deseja realmente excluir este registro?')) return;
+
+  mostrarStatus(area, 'Excluindo...');
+
+  const {error} = await supabaseClient
+    .from(tabela).delete().eq('id',id);
+
+  if (error) {
+    mostrarStatus(area, 'Não foi possível excluir: ' + error.message);
+    return;
+  }
+
+  await carregarTudo();
+  mostrarStatus(area, 'Registro excluído.');
+}
+
+function abrir(tipo, id = '') {
+  const dados = {
+    curso: estado.cursos,
+    modulo: estado.modulos,
+    aula: estado.aulas,
+    material: estado.materiais
+  }[tipo];
+
+  const registro = id
+    ? dados.find(item => String(item.id) === String(id))
+    : null;
+
+  fecharFormularios();
+
+  const form = $('form-' + tipo);
+  form.hidden = false;
+  $(tipo + '-id').value = registro ? registro.id : '';
+
+  if (tipo === 'curso') {
+    $('titulo-form-curso').textContent = registro ? 'Editar curso' : 'Cadastrar curso';
+    $('curso-titulo').value = registro?.title || '';
+    $('curso-descricao').value = registro?.description || '';
+    $('curso-nivel').value = registro?.level || '';
+    $('curso-carga').value = registro?.workload_hours ?? '';
+    $('curso-capa').value = registro?.cover_url || '';
+    $('curso-ordem').value = registro?.sort_order ?? 0;
+    $('curso-publicado').checked = !!registro?.published;
+  }
+
+  if (tipo === 'modulo') {
+    $('titulo-form-modulo').textContent = registro ? 'Editar módulo' : 'Cadastrar módulo';
+    $('modulo-curso').value = registro?.course_id || '';
+    $('modulo-titulo').value = registro?.title || '';
+    $('modulo-descricao').value = registro?.description || '';
+    $('modulo-ordem').value = registro?.sort_order ?? 0;
+  }
+
+  if (tipo === 'aula') {
+    $('titulo-form-aula').textContent = registro ? 'Editar aula' : 'Cadastrar aula';
+    $('aula-modulo').value = registro?.module_id || '';
+    $('aula-titulo').value = registro?.title || '';
+    $('aula-descricao').value = registro?.description || '';
+    $('aula-video').value = registro?.video_url || '';
+    $('aula-duracao').value = registro?.duration_minutes ?? '';
+    $('aula-ordem').value = registro?.sort_order ?? 0;
+    $('aula-publicada').checked = !!registro?.published;
+  }
+
+  if (tipo === 'material') {
+    $('titulo-form-material').textContent = registro ? 'Editar material' : 'Cadastrar material';
+    $('material-aula').value = registro?.lesson_id || '';
+    $('material-titulo').value = registro?.title || '';
+    $('material-url').value = registro?.file_url || '';
+    $('material-tipo').value = registro?.resource_type || 'pdf';
+  }
+
+  form.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
 async function verificarAdministrador() {
-  const { data: { user }, error } = await supabaseClient.auth.getUser();
+  const {data:{user},error} = await supabaseClient.auth.getUser();
 
   if (error || !user) {
     location.href = 'login.html';
     return;
   }
 
-  const { data: perfil, error: erroPerfil } = await supabaseClient
+  const {data:perfil,error:erroPerfil} = await supabaseClient
     .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
+    .select('role,full_name')
+    .eq('id',user.id)
     .maybeSingle();
 
   if (erroPerfil || !perfil || perfil.role !== 'admin') {
@@ -169,180 +550,166 @@ async function verificarAdministrador() {
     return;
   }
 
-  $('mensagem').textContent = 'Olá, ' + (perfil.full_name || user.email) + '!';
+  $('mensagem').textContent =
+    'Olá, ' + (perfil.full_name || user.email) + '!';
+
   $('painel').hidden = false;
-  carregarCursos();
+  await carregarTudo();
 }
 
-async function carregarCursos() {
-  const lista = $('lista-cursos');
-  $('status-cursos').textContent = 'Carregando cursos...';
+/* BOTÕES DE CADASTRO */
 
-  const { data, error } = await supabaseClient
-    .from('courses')
-    .select('id, title, slug, description, cover_url, level, workload_hours, published, sort_order')
-    .order('sort_order', { ascending: true });
+$('novo-curso').onclick = () => abrir('curso');
+$('novo-modulo').onclick = () => abrir('modulo');
+$('nova-aula').onclick = () => abrir('aula');
+$('novo-material').onclick = () => abrir('material');
 
-  if (error) {
-    $('status-cursos').textContent = 'Erro ao carregar cursos: ' + error.message;
+document.querySelectorAll('[data-cancel]').forEach(botao => {
+  botao.onclick = () => {
+    const tipo = botao.dataset.cancel;
+    $('form-' + tipo).reset();
+    $('form-' + tipo).hidden = true;
+    $(tipo + '-id').value = '';
+  };
+});
+
+/* SALVAR CURSO */
+
+$('form-curso').onsubmit = async e => {
+  e.preventDefault();
+
+  const titulo = $('curso-titulo').value.trim();
+  const capa = $('curso-capa').value.trim();
+
+  if (capa && !urlSegura(capa)) {
+    mostrarStatus('cursos','Informe um endereço de imagem HTTP ou HTTPS válido.');
     return;
   }
 
-  lista.innerHTML = '';
-
-  if (!data || !data.length) {
-    lista.innerHTML = '<p>Nenhum curso cadastrado ainda.</p>';
-  } else {
-    data.forEach(curso => {
-      const item = document.createElement('article');
-      item.className = 'course-row';
-      const imagem = curso.cover_url
-        ? `<img src="${escapar(curso.cover_url)}" alt="">`
-        : '';
-
-      item.innerHTML = `
-        <div class="course-row-header">
-          ${imagem}
-          <div>
-            <h3>${escapar(curso.title)}</h3>
-            <p>${curso.published ? 'Publicado' : 'Rascunho'}</p>
-            <p>${escapar(curso.level || 'Nível não definido')}</p>
-          </div>
-        </div>
-        <div class="admin-actions">
-          <button type="button" data-edit="${escapar(curso.id)}">Editar</button>
-          <button type="button" class="delete" data-delete="${escapar(curso.id)}">Excluir</button>
-        </div>
-      `;
-      lista.appendChild(item);
-    });
-  }
-
-  $('status-cursos').textContent = '';
-}
-
-function limparFormulario() {
-  $('form-curso').reset();
-  $('curso-id').value = '';
-  $('titulo-form').textContent = 'Cadastrar curso';
-  $('form-curso').hidden = true;
-}
-
-$('novo-curso').addEventListener('click', () => {
-  limparFormulario();
-  $('form-curso').hidden = false;
-  $('titulo').focus();
-});
-
-$('cancelar').addEventListener('click', limparFormulario);
-
-$('form-curso').addEventListener('submit', async event => {
-  event.preventDefault();
-
-  const id = $('curso-id').value;
-  const titulo = $('titulo').value.trim();
-
-  if (!titulo) return;
-
-  const registro = {
+  const dados = {
     title: titulo,
     slug: slugificar(titulo),
-    description: $('descricao').value.trim() || null,
-    level: $('nivel').value || null,
-    workload_hours: $('carga').value ? Number($('carga').value) : null,
-    cover_url: $('capa').value.trim() || null,
-    published: $('publicado').checked
+    description: $('curso-descricao').value.trim() || null,
+    level: $('curso-nivel').value.trim() || null,
+    workload_hours: $('curso-carga').value ? Number($('curso-carga').value) : null,
+    cover_url: capa || null,
+    sort_order: Number($('curso-ordem').value || 0),
+    published: $('curso-publicado').checked
   };
 
-  $('status-cursos').textContent = 'Salvando curso...';
+  await salvar('courses',$('curso-id').value,dados,'cursos');
+};
 
-  let resultado;
+/* SALVAR MÓDULO */
 
-  if (id) {
-    resultado = await supabaseClient
-      .from('courses')
-      .update(registro)
-      .eq('id', id);
-  } else {
-    resultado = await supabaseClient
-      .from('courses')
-      .insert(registro);
-  }
+$('form-modulo').onsubmit = async e => {
+  e.preventDefault();
 
-  if (resultado.error) {
-    $('status-cursos').textContent = 'Erro ao salvar: ' + resultado.error.message;
+  await salvar('modules',$('modulo-id').value,{
+    course_id: $('modulo-curso').value,
+    title: $('modulo-titulo').value.trim(),
+    description: $('modulo-descricao').value.trim() || null,
+    sort_order: Number($('modulo-ordem').value || 0)
+  },'modulos');
+};
+
+/* SALVAR AULA */
+
+$('form-aula').onsubmit = async e => {
+  e.preventDefault();
+
+  const video = $('aula-video').value.trim();
+
+  if (video && !urlSegura(video)) {
+    mostrarStatus('aulas','Informe um endereço de vídeo HTTP ou HTTPS válido.');
     return;
   }
 
-  limparFormulario();
-  $('status-cursos').textContent = 'Curso salvo com sucesso!';
-  carregarCursos();
-});
+  await salvar('lessons',$('aula-id').value,{
+    module_id: $('aula-modulo').value,
+    title: $('aula-titulo').value.trim(),
+    description: $('aula-descricao').value.trim() || null,
+    video_url: video || null,
+    duration_minutes: $('aula-duracao').value
+      ? Number($('aula-duracao').value) : null,
+    sort_order: Number($('aula-ordem').value || 0),
+    published: $('aula-publicada').checked
+  },'aulas');
+};
 
-$('lista-cursos').addEventListener('click', async event => {
-  const editar = event.target.closest('[data-edit]');
-  const excluir = event.target.closest('[data-delete]');
+/* SALVAR MATERIAL */
 
-  if (editar) {
-    const { data, error } = await supabaseClient
-      .from('courses')
-      .select('*')
-      .eq('id', editar.dataset.edit)
-      .single();
+$('form-material').onsubmit = async e => {
+  e.preventDefault();
 
-    if (error) {
-      $('status-cursos').textContent = 'Erro ao abrir curso: ' + error.message;
-      return;
-    }
+  const url = $('material-url').value.trim();
 
-    $('curso-id').value = data.id;
-    $('titulo').value = data.title || '';
-    $('descricao').value = data.description || '';
-    $('nivel').value = data.level || '';
-    $('carga').value = data.workload_hours ?? '';
-    $('capa').value = data.cover_url || '';
-    $('publicado').checked = !!data.published;
-    $('titulo-form').textContent = 'Editar curso';
-    $('form-curso').hidden = false;
-    $('titulo').focus();
+  if (!urlSegura(url)) {
+    mostrarStatus('materiais','Informe um endereço HTTP ou HTTPS válido.');
+    return;
   }
 
-  if (excluir) {
-    if (!confirm('Tem certeza que deseja excluir este curso?')) return;
+  await salvar('lesson_resources',$('material-id').value,{
+    lesson_id: $('material-aula').value,
+    title: $('material-titulo').value.trim(),
+    file_url: url,
+    resource_type: $('material-tipo').value
+  },'materiais');
+};
 
-    const { error } = await supabaseClient
-      .from('courses')
-      .delete()
-      .eq('id', excluir.dataset.delete);
+/* EDITAR E EXCLUIR */
 
-    if (error) {
-      $('status-cursos').textContent = 'Erro ao excluir: ' + error.message;
-      return;
-    }
+document.addEventListener('click', async e => {
+  const editar = e.target.closest('[data-edit]');
+  const apagar = e.target.closest('[data-delete]');
 
-    $('status-cursos').textContent = 'Curso excluído.';
-    carregarCursos();
+  if (editar) abrir(editar.dataset.type,editar.dataset.edit);
+
+  if (apagar) {
+    const tipo = apagar.dataset.type;
+    const tabela = {
+      curso:'courses',
+      modulo:'modules',
+      aula:'lessons',
+      material:'lesson_resources'
+    }[tipo];
+
+    const area = {
+      curso:'cursos',
+      modulo:'modulos',
+      aula:'aulas',
+      material:'materiais'
+    }[tipo];
+
+    await excluir(tabela,apagar.dataset.delete,area);
   }
 });
+
+/* NAVEGAÇÃO */
 
 document.querySelectorAll('[data-section]').forEach(botao => {
-  botao.addEventListener('click', () => {
+  botao.onclick = () => {
     const secao = botao.dataset.section;
-    $('sec-cursos').hidden = secao !== 'cursos';
-    $('sec-outros').hidden = secao !== 'outros';
 
-    document.querySelectorAll('[data-section]').forEach(b =>
-      b.classList.toggle('active', b === botao)
-    );
-  });
+    ['cursos','modulos','aulas','materiais'].forEach(nome => {
+      $('sec-' + nome).hidden = nome !== secao;
+    });
+
+    document.querySelectorAll('[data-section]').forEach(b => {
+      b.classList.toggle('active',b === botao);
+    });
+  };
 });
 
-$('sair').addEventListener('click', async () => {
+/* SAIR */
+
+$('sair').onclick = async () => {
   await supabaseClient.auth.signOut();
   location.href = 'login.html';
-});
+};
 
 verificarAdministrador();
 </script>
+
 </body>
 </html>
