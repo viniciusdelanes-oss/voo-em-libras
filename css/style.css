@@ -434,3 +434,104 @@ footer p {
     padding: 28px 24px;
   }
 }
+
+/* APRESENTAÇÃO DA PROFESSORA */
+.professora-section {
+  background: #f7f2fc;
+}
+
+.professora-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 40px;
+  align-items: start;
+  margin-top: 35px;
+  padding: 35px;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 10px 35px rgba(80, 56, 121, 0.10);
+}
+
+.professora-foto {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #e8dcf7;
+}
+
+.professora-foto img {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  max-height: 440px;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.professora-info h3 {
+  margin: 0 0 10px;
+  color: #503879;
+  font-size: 28px;
+}
+
+.professora-titulo {
+  color: #7256a5;
+  font-weight: 600;
+}
+
+.professora-info p {
+  line-height: 1.8;
+  color: #756c80;
+}
+
+.professora-info h4 {
+  margin: 25px 0 10px;
+  color: #503879;
+  font-size: 18px;
+}
+
+.professora-info ul {
+  padding-left: 22px;
+  color: #756c80;
+  line-height: 1.9;
+}
+
+.professora-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.professora-links a:not(.btn-primary) {
+  color: #7256a5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.professora-links a:not(.btn-primary):hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .professora-card {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 22px;
+  }
+
+  .professora-foto {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .professora-foto img {
+    min-height: 300px;
+    max-height: 380px;
+  }
+
+  .professora-info h3 {
+    font-size: 24px;
+  }
+}
