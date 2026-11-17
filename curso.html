@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso | Vôo em Libras</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .container {
+      max-width: 1000px;
+      margin: 35px auto;
+      padding: 20px;
+    }
+    .modulo {
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 3px 14px #00000012;
+    }
+    .aula {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 14px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f8f9fc;
+      cursor: pointer;
+    }
+    .aula:hover { background: #eaf0ff; }
+    .conteudo-aula {
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 3px 14px #00000012;
+    }
+    .video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 0;
+      border-radius: 10px;
+    }
+    .material {
+      display: block;
+      margin: 10px 0;
+    }
+    .voltar { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <button class="voltar" onclick="history.back()">← Voltar</button>
+    <h1 id="titulo-curso">Carregando curso...</h1>
+    <p id="descricao-curso"></p>
+
+    <div id="mensagem">Carregando módulos e aulas...</div>
+    <div id="lista-modulos"></div>
+
+    <section id="conteudo-aula" class="conteudo-aula" hidden>
+      <h2 id="titulo-aula"></h2>
+      <p id="descricao-aula"></p>
+      <div id="video-aula"></div>
+      <h3>Materiais de apoio</h3>
+      <div id="materiais-aula"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    const parametros = new URLSearchParams(window.location.search);
+    const cursoId = parametros.get('id');
+
+    const mensagem = document.getElementById('mensagem');
+    const listaModulos = document.getElementById('lista-modulos');
+
+    function escapar(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;',
+        '"': '&quot;', "'": '&#39;'
+      })[caractere]);
+    }
+
+    function linkVideo(url) {
+      try {
+        const endereco = new URL(url);
+        if (endereco.protocol !== 'https:' && endereco.protocol !== 'http:') return '';
+        let id = '';
+
+        if (endereco.hostname.includes('youtube.com')) {
+          id = endereco.searchParams.get('v') || '';
+        } else if (endereco.hostname === 'youtu.be') {
+          id = endereco.pathname.slice(1);
+        }
+
+        if (id && /^[\w-]{11}$/.test(id)) {
+          return 'https://www.youtube-nocookie.com/embed/' + id;
+        }
+
+        if (endereco.hostname === 'www.youtube-nocookie.com' &&
+            endereco.pathname.startsWith('/embed/')) {
+          return endereco.href;
+        }
+
+        if (endereco.hostname === 'www.youtube.com' &&
+            endereco.pathname.startsWith('/embed/')) {
+          return 'https://www.youtube-nocookie.com' + endereco.pathname;
+        }
+
+        return '';
+      } catch {
+        return '';
+      }
+    }
+
+    async function iniciar() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        mensagem.textContent = 'Faça login para acessar as aulas.';
+        return;
+      }
+
+      if (!cursoId) {
+        mensagem.textContent = 'Curso não identificado.';
+        return;
+      }
+
+      const { data: curso, error: erroCurso } = await supabaseClient
+        .from('courses')
+        .select('id, title, description')
+        .eq('id', cursoId)
+        .eq('published', true)
+        .maybeSingle();
+
+      if (erroCurso || !curso) {
+        mensagem.textContent = 'Curso não encontrado ou não publicado.';
+        return;
+      }
+
+      document.getElementById('titulo-curso').textContent = curso.title;
+      document.getElementById('descricao-curso').textContent = curso.description || '';
+
+      const { data: modulos, error: erroModulos } = await supabaseClient
+        .from('modules')
+        .select('id, title, description, sort_order')
+        .eq('course_id', cursoId)
+        .order('sort_order', { ascending: true });
+
+      if (erroModulos) {
+        mensagem.textContent = 'Erro ao carregar módulos: ' + erroModulos.message;
+        return;
+      }
+
+      if (!modulos || modulos.length === 0) {
+        mensagem.textContent = 'Este curso ainda não possui módulos.';
+        return;
+      }
+
+      mensagem.textContent = '';
+
+      for (const modulo of modulos) {
+        const { data: aulas, error: erroAulas } = await supabaseClient
+          .from('lessons')
+          .select('id, title, description, video_url, duration_minutes, sort_order')
+          .eq('module_id', modulo.id)
+          .eq('published', true)
+          .order('sort_order', { ascending: true });
+
+        if (erroAulas) {
+          mensagem.textContent = 'Erro ao carregar aulas: ' + erroAulas.message;
+          return;
+        }
+
+        const bloco = document.createElement('section');
+        bloco.className = 'modulo';
+
+        const titulo = document.createElement('h2');
+        titulo.textContent = modulo.title;
+        bloco.appendChild(titulo);
+
+        if (modulo.description) {
+          const descricao = document.createElement('p');
+          descricao.textContent = modulo.description;
+          bloco.appendChild(descricao);
+        }
+
+        if (!aulas || aulas.length === 0) {
+          const aviso = document.createElement('p');
+          aviso.textContent = 'Nenhuma aula publicada neste módulo.';
+          bloco.appendChild(aviso);
+        } else {
+          aulas.forEach(aula => {
+            const botao = document.createElement('button');
+            botao.className = 'aula';
+            botao.type = 'button';
+            botao.textContent = aula.title +
+              (aula.duration_minutes ? ' — ' + aula.duration_minutes + ' min' : '');
+            botao.addEventListener('click', () => abrirAula(aula));
+            bloco.appendChild(botao);
+          });
+        }
+
+        listaModulos.appendChild(bloco);
+      }
+    }
+
+    async function abrirAula(aula) {
+      const area = document.getElementById('conteudo-aula');
+      area.hidden = false;
+
+      document.getElementById('titulo-aula').textContent = aula.title;
+      document.getElementById('descricao-aula').textContent = aula.description || '';
+
+      const video = linkVideo(aula.video_url || '');
+      document.getElementById('video-aula').innerHTML = video
+        ? `<iframe class="video" src="${escapar(video)}" title="${escapar(aula.title)}" allowfullscreen loading="lazy"></iframe>`
+        : '<p>Esta aula ainda não possui vídeo disponível.</p>';
+
+      const materiais = document.getElementById('materiais-aula');
+      materiais.textContent = 'Carregando materiais...';
+
+      const { data, error } = await supabaseClient
+        .from('lesson_resources')
+        .select('title, file_url, resource_type')
+        .eq('lesson_id', aula.id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        materiais.textContent = 'Não foi possível carregar os materiais.';
+        return;
+      }
+
+      materiais.replaceChildren();
+
+      if (!data || data.length === 0) {
+        materiais.textContent = 'Nenhum material disponível.';
+      } else {
+        data.forEach(item => {
+          try {
+            const url = new URL(item.file_url);
+            if (!['http:', 'https:'].includes(url.protocol)) return;
+
+            const link = document.createElement('a');
+            link.className = 'material';
+            link.href = url.href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = item.title + ' (' + (item.resource_type || 'Material') + ')';
+            materiais.appendChild(link);
+          } catch {}
+        });
+      }
+
+      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
