@@ -688,3 +688,219 @@ footer p {
   min-width: 0;
 }
 
+/* =====================================
+   RESPONSIVIDADE GERAL - VOO EM LIBRAS
+   ===================================== */
+
+@media (max-width: 850px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 92%;
+  }
+
+  /* CABEÇALHO */
+  header .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 0;
+  }
+
+  nav {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 20px;
+    font-size: 13px;
+  }
+
+  .header-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* INÍCIO */
+  .hero {
+    padding: 50px 0;
+  }
+
+  .hero .container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .hero p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-image {
+    min-height: 240px;
+    border-radius: 22px;
+  }
+
+  /* SEÇÕES */
+  .section {
+    padding: 55px 0;
+  }
+
+  .section h2 {
+    font-size: 30px;
+  }
+
+  /* PLANOS */
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .plan-card {
+    width: 100%;
+  }
+
+  /* PROFESSORA */
+  .professora-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 22px;
+    gap: 25px;
+  }
+
+  .professora-foto {
+    flex: none;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .professora-info {
+    width: 100%;
+  }
+
+  /* LIVROS */
+  .livros-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+  }
+
+  .livro-imagem {
+    height: 210px;
+  }
+
+  /* RODAPÉ */
+  footer {
+    padding: 35px 15px;
+  }
+}
+
+/* CELULARES PEQUENOS */
+@media (max-width: 480px) {
+
+  .logo {
+    font-size: 23px;
+  }
+
+  nav {
+    gap: 10px 15px;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .btn-primary {
+    padding: 11px 15px;
+    font-size: 12px;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .hero-image {
+    min-height: 200px;
+  }
+
+  .section {
+    padding: 45px 0;
+  }
+
+  .section h2 {
+    font-size: 27px;
+  }
+
+  .plan-card {
+    padding: 25px 20px;
+  }
+
+  .professora-card {
+    padding: 17px;
+  }
+
+  .professora-info h3 {
+    font-size: 23px;
+  }
+
+  .professora-info p,
+  .professora-info li {
+    font-size: 14px;
+  }
+
+  .professora-links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .professora-links a {
+    text-align: center;
+  }
+
+  .livros-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .livro-card {
+    padding: 12px 9px;
+  }
+
+  .livro-imagem {
+    height: 180px;
+  }
+
+  .livro-card h3 {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .livro-card a {
+    font-size: 11px;
+    padding: 9px 8px;
+  }
+}
+
+/* TELAS MUITO ESTREITAS */
+@media (max-width: 360px) {
+
+  .livros-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .livro-imagem {
+    height: 250px;
+  }
+
+  .hero h1 {
+    font-size: 31px;
+  }
+}
+
