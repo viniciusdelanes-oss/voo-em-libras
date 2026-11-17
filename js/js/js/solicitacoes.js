@@ -46,43 +46,38 @@ async function carregarSolicitacoes() {
     dataPedido.textContent = 'Solicitado em: ' +
       new Date(pedido.created_at).toLocaleString('pt-BR');
 
-  if (pedido.status === 'pending') {
-  const botao = document.createElement('button');
-  botao.textContent = 'Confirmar pagamento';
-  botao.className = 'btn-primary';
+    cartao.append(titulo, email, valor, situacao, dataPedido);
 
-  botao.onclick = async () => {
-    const confirmar = confirm(
-      'Confirma que recebeu o pagamento deste aluno via Pix?'
-    );
-
-    if (!confirmar) return;
-
-    botao.disabled = true;
-    botao.textContent = 'Processando...';
-
-    const { data, error } = await supabaseClient.rpc(
-      'confirmar_pagamento_plano',
-      { p_request_id: pedido.id }
-    );
-
-    if (error) {
-      alert('Erro: ' + error.message);
-      botao.disabled = false;
+    if (pedido.status === 'pending') {
+      const botao = document.createElement('button');
       botao.textContent = 'Confirmar pagamento';
-      return;
+      botao.className = 'btn-primary';
+
+      botao.onclick = async () => {
+        if (!confirm('Confirma que recebeu o Pix deste aluno?')) return;
+
+        botao.disabled = true;
+        botao.textContent = 'Processando...';
+
+        const { data, error } = await supabaseClient.rpc(
+          'confirmar_pagamento_plano',
+          { p_request_id: pedido.id }
+        );
+
+        if (error) {
+          alert('Erro: ' + error.message);
+          botao.disabled = false;
+          botao.textContent = 'Confirmar pagamento';
+          return;
+        }
+
+        alert(data);
+        carregarSolicitacoes();
+      };
+
+      cartao.appendChild(botao);
     }
 
-    alert(data);
-    carregarSolicitacoes();
-  };
-
-  cartao.append(
-    titulo, email, valor, situacao, dataPedido, botao
-  );
-} else {
-  cartao.append(titulo, email, valor, situacao, dataPedido);
-}
     lista.appendChild(cartao);
   });
 }
