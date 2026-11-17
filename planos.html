@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planos | Vôo em Libras</title>
+  <title>Matrícula | Vôo em Libras</title>
   <link rel="stylesheet" href="css/style.css">
 
   <style>
@@ -17,7 +17,7 @@
 
     .planos-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 24px;
       margin-top: 35px;
     }
@@ -34,9 +34,9 @@
     }
 
     .preco {
-      font-size: 28px;
+      font-size: 25px;
       font-weight: bold;
-      margin: 20px 0;
+      margin: 12px 0;
     }
 
     .plano-card button {
@@ -44,9 +44,10 @@
       color: white;
       border: 0;
       border-radius: 8px;
-      padding: 13px 22px;
+      padding: 13px;
       cursor: pointer;
       width: 100%;
+      margin-top: 10px;
     }
 
     .plano-card button:hover {
@@ -56,33 +57,34 @@
     .mensagem {
       padding: 20px;
     }
+
+    .modalidade {
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body>
-
   <main class="planos-container">
-
-    <h1>Escolha seu plano</h1>
+    <h1>Escolha seu nível de aprendizagem</h1>
 
     <p>
-      Aprenda Libras no seu ritmo e tenha acesso
-      aos conteúdos da nossa plataforma.
+      Escolha seu nível e sua modalidade de aula presencial.
+      Você também terá acesso aos materiais de apoio na área do aluno.
     </p>
 
     <div id="mensagem" class="mensagem">
-      Carregando planos...
+      Carregando níveis...
     </div>
 
     <div id="lista-planos" class="planos-grid"></div>
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
 
   <script>
-
     const lista = document.getElementById('lista-planos');
     const mensagem = document.getElementById('mensagem');
 
@@ -96,30 +98,20 @@
       })[c]);
     }
 
-    function formatarPreco(valor) {
-      return Number(valor || 0).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
-    }
-
     async function carregarPlanos() {
-
       const { data, error } = await supabaseClient
         .from('plans')
-        .select('id, name, description, price_cents')
+        .select('id, name, description')
         .eq('active', true)
-        .order('price_cents', { ascending: true });
+        .order('name');
 
       if (error) {
-        mensagem.textContent =
-          'Erro ao carregar planos: ' + error.message;
+        mensagem.textContent = 'Erro ao carregar níveis: ' + error.message;
         return;
       }
 
       if (!data || data.length === 0) {
-        mensagem.textContent =
-          'Nenhum plano disponível no momento.';
+        mensagem.textContent = 'Nenhum nível disponível no momento.';
         return;
       }
 
@@ -127,84 +119,91 @@
 
       lista.innerHTML = data.map(plano => `
         <article class="plano-card">
-
           <h2>${escapar(plano.name)}</h2>
 
-          <p>
-            ${escapar(
-              plano.description ||
-              'Acesso aos conteúdos da plataforma.'
-            )}
-          </p>
+          <p>${escapar(plano.description || 'Curso de Libras com aulas presenciais e materiais de apoio.')}</p>
 
-          <div class="preco">
-            ${formatarPreco(plano.price_cents / 100)}
-          </div>
+          <div class="modalidade">Aula individual</div>
+          <div class="preco">R$ 150,00/mês</div>
 
-          <button
-            type="button"
-            onclick="escolherPlano('${escapar(plano.id)}')">
-            Escolher este plano
+          <button type="button"
+            onclick="escolherPlano('${escapar(plano.id)}', 'individual')">
+            Escolher individual
           </button>
 
+          <div class="modalidade">Aula em grupo</div>
+          <div class="preco">R$ 100,00/mês por aluno</div>
+
+          <button type="button"
+            onclick="escolherPlano('${escapar(plano.id)}', 'grupo')">
+            Escolher em grupo
+          </button>
         </article>
       `).join('');
     }
 
-    async function escolherPlano(id) {
-
+    async function escolherPlano(id, modalidade) {
       const {
         data: { user },
         error: erroLogin
       } = await supabaseClient.auth.getUser();
 
       if (erroLogin || !user) {
-        alert('Faça login ou crie sua conta para escolher um plano.');
+        alert('Faça login ou crie sua conta para solicitar a matrícula.');
         window.location.href = 'index.html';
         return;
       }
 
-      const { data: plano, error: erroPlano } =
-        await supabaseClient
-          .from('plans')
-          .select('id, name')
-          .eq('id', id)
-          .eq('active', true)
-          .maybeSingle();
+      const { data: plano, error: erroPlano } = await supabaseClient
+        .from('plans')
+        .select('id, name')
+        .eq('id', id)
+        .eq('active', true)
+        .maybeSingle();
 
       if (erroPlano || !plano) {
-        alert('Não foi possível localizar este plano.');
+        alert('Não foi possível localizar este nível.');
         return;
       }
+
+      const valor = modalidade === 'individual' ? 150 : 100;
+
+      const confirmar = confirm(
+        'Confirme sua matrícula:\n\n' +
+        'Nível: ' + plano.name + '\n' +
+        'Modalidade: ' + (modalidade === 'individual' ? 'Individual' : 'Em grupo') + '\n' +
+        'Mensalidade: R$ ' + valor.toFixed(2).replace('.', ',') +
+        '\n\nDeseja enviar a solicitação?'
+      );
+
+      if (!confirmar) return;
 
       const { error: erroPedido } = await supabaseClient
         .from('plan_requests')
         .insert({
           user_id: user.id,
           plan_id: plano.id,
-          status: 'pending'
+          status: 'pending',
+          modalidade: modalidade,
+          valor_mensal: valor
         });
 
       if (erroPedido) {
-        alert(
-          'Erro ao registrar solicitação: ' +
-          erroPedido.message
-        );
+        alert('Erro ao registrar solicitação: ' + erroPedido.message);
         return;
       }
 
       alert(
-        'Solicitação registrada com sucesso!\n\n' +
-        'Plano escolhido: ' + plano.name +
-        '\n\nAguarde nosso contato com as instruções ' +
-        'para pagamento via Pix. O acesso será liberado ' +
-        'após a confirmação do pagamento.'
+        'Solicitação de matrícula registrada!\n\n' +
+        'Nível: ' + plano.name +
+        '\nModalidade: ' + (modalidade === 'individual' ? 'Individual' : 'Em grupo') +
+        '\nMensalidade: R$ ' + valor.toFixed(2).replace('.', ',') +
+        '\n\nAguarde as instruções para pagamento via Pix. ' +
+        'O acesso será liberado após a confirmação.'
       );
     }
 
     carregarPlanos();
-
   </script>
-
 </body>
 </html>
