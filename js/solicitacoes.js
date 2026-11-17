@@ -47,6 +47,37 @@ async function carregarSolicitacoes() {
       new Date(pedido.created_at).toLocaleString('pt-BR');
 
     cartao.append(titulo, email, valor, situacao, dataPedido);
+
+    if (pedido.status === 'pending') {
+      const botao = document.createElement('button');
+      botao.textContent = 'Confirmar pagamento';
+      botao.className = 'btn-primary';
+
+      botao.onclick = async () => {
+        if (!confirm('Confirma que recebeu o Pix deste aluno?')) return;
+
+        botao.disabled = true;
+        botao.textContent = 'Processando...';
+
+        const { data, error } = await supabaseClient.rpc(
+          'confirmar_pagamento_plano',
+          { p_request_id: pedido.id }
+        );
+
+        if (error) {
+          alert('Erro: ' + error.message);
+          botao.disabled = false;
+          botao.textContent = 'Confirmar pagamento';
+          return;
+        }
+
+        alert(data);
+        carregarSolicitacoes();
+      };
+
+      cartao.appendChild(botao);
+    }
+
     lista.appendChild(cartao);
   });
 }
