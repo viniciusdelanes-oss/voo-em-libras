@@ -75,7 +75,13 @@
 if (perfil?.role === 'admin') {
   window.location.href = 'admin.html';
 } else {
-  window.location.href = 'aluno.html';
+  const destino = new URLSearchParams(window.location.search).get('next');
+
+  if (destino === 'planos.html') {
+    window.location.href = 'planos.html';
+  } else {
+    window.location.href = 'aluno.html';
+  }
 }
     });
   </script>
