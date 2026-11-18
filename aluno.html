@@ -132,6 +132,7 @@
         'Olá, ' + (perfil?.full_name || user.email) + '!';
 await carregarMatricula(user.id);
       await carregarMateriais(user.id);
+      await carregarMateriaisIndividuais(user.id);
       const { data: matriculas, error: erroMatriculas } = await supabaseClient
         .from('subscriptions')
         .select('status, current_period_end, plan_id')
