@@ -461,6 +461,9 @@ function atualizarOpcoes() {
     const modulo = estado.modulos.find(m => m.id === a.module_id);
     return (modulo ? modulo.title + ' — ' : '') + a.title;
   });
+    opcoes('individual-aluno', estado.alunos, a =>
+    a.full_name || 'Aluno sem nome'
+  );
 }
 
 function cartao(titulo, descricao, id, tipo) {
