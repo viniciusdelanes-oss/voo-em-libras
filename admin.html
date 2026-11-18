@@ -487,7 +487,23 @@ function renderizarTudo() {
         c.id,'curso'
       )).join('')
     : '<p>Nenhum curso cadastrado.</p>';
+  $('lista-individuais').innerHTML = estado.materiaisIndividuais.length
+    ? estado.materiaisIndividuais.map(r => {
+        const aluno = estado.alunos.find(a => a.id === r.student_id);
 
+        return `
+          <article class="item">
+            <h3>${escapar(r.title)}</h3>
+            <p>Aluno: ${escapar(aluno?.full_name || 'Aluno não encontrado')}</p>
+            <p>Tipo: ${escapar(r.resource_type || 'Outro')}</p>
+            <p><a href="${escapar(urlSegura(r.file_url))}" target="_blank" rel="noopener">Abrir material</a></p>
+            <div class="actions">
+              <button type="button" data-edit="${escapar(r.id)}" data-type="individual">Editar</button>
+              <button type="button" class="danger" data-delete="${escapar(r.id)}" data-type="individual">Excluir</button>
+            </div>
+          </article>`;
+      }).join('')
+    : '<p>Nenhum material individual cadastrado.</p>';
   $('lista-modulos').innerHTML = estado.modulos.length
     ? estado.modulos.map(m => {
         const curso = estado.cursos.find(c => c.id === m.course_id);
