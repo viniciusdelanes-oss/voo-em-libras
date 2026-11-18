@@ -424,7 +424,29 @@ async function carregarTudo() {
       estado[chave] = data || [];
     }
   }
+  const {data: alunos, error: erroAlunos} = await supabaseClient
+    .from('profiles')
+    .select('id, full_name, role')
+    .order('full_name');
 
+  if (erroAlunos) {
+    mostrarStatus('individuais', 'Erro ao carregar alunos: ' + erroAlunos.message);
+    estado.alunos = [];
+  } else {
+    estado.alunos = (alunos || []).filter(a => a.role !== 'admin');
+  }
+
+  const {data: individuais, error: erroIndividuais} = await supabaseClient
+    .from('student_resources')
+    .select('*')
+    .order('created_at', {ascending:false});
+
+  if (erroIndividuais) {
+    mostrarStatus('individuais', 'Erro ao carregar materiais: ' + erroIndividuais.message);
+    estado.materiaisIndividuais = [];
+  } else {
+    estado.materiaisIndividuais = individuais || [];
+  }
   atualizarOpcoes();
   renderizarTudo();
 }
