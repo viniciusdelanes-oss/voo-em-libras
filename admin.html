@@ -832,7 +832,13 @@ document.addEventListener('click', async e => {
   const editar = e.target.closest('[data-edit]');
   const apagar = e.target.closest('[data-delete]');
 
-  if (editar) abrir(editar.dataset.type,editar.dataset.edit);
+if (editar) {
+  if (editar.dataset.type === 'individual') {
+    abrirIndividual(editar.dataset.edit);
+  } else {
+    abrir(editar.dataset.type,editar.dataset.edit);
+  }
+});
 
   if (apagar) {
     const tipo = apagar.dataset.type;
