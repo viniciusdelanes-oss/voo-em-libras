@@ -406,7 +406,59 @@ async function carregarMateriais(userId) {
     console.error('Erro ao carregar materiais:', erro);
   }
 }
+async function carregarMateriaisIndividuais(userId) {
+  const container = document.getElementById('materiais-individuais-container');
 
+  const { data, error } = await supabaseClient
+    .from('student_resources')
+    .select('title, file_url, resource_type, created_at')
+    .eq('student_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.textContent = 'Não foi possível carregar seus materiais exclusivos.';
+    console.error(error);
+    return;
+  }
+
+  const materiais = data || [];
+
+  if (!materiais.length) {
+    container.innerHTML = '<p>Você ainda não recebeu materiais individuais.</p>';
+    return;
+  }
+
+  const icones = {
+    pdf: '📄',
+    apostila: '📚',
+    atividade: '📝',
+    link: '🔗',
+    outro: '📎'
+  };
+
+  container.innerHTML = materiais.map(material => {
+    let endereco = '';
+
+    try {
+      const url = new URL(material.file_url);
+      if (['https:', 'http:'].includes(url.protocol)) {
+        endereco = url.href;
+      }
+    } catch {}
+
+    if (!endereco) return '';
+
+    return `
+      <article class="plan-card">
+        <h3>${icones[material.resource_type] || '📎'} ${escaparHTML(material.title)}</h3>
+        <a href="${escaparHTML(endereco)}"
+           target="_blank" rel="noopener noreferrer">
+          Acessar material
+        </a>
+      </article>
+    `;
+  }).join('') || '<p>Nenhum material válido disponível.</p>';
+}
     function escaparHTML(valor) {
       return String(valor).replace(/[&<>"']/g, caractere => ({
         '&': '&amp;',
