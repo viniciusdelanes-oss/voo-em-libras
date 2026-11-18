@@ -74,9 +74,15 @@
         return;
       }
 
-      mensagem.textContent = data.session
-        ? 'Conta criada! Você já pode entrar.'
-        : 'Cadastro realizado! Confira seu e-mail para confirmar a conta.';
+      if (data.session) {
+  mensagem.textContent = 'Conta criada! Redirecionando para os planos...';
+  window.location.href = 'planos.html';
+} else {
+  mensagem.innerHTML = `
+    Conta criada com sucesso! Confira seu e-mail para confirmar o cadastro.
+    Depois, <a href="login.html?next=planos.html">clique aqui para entrar e escolher seu plano</a>.
+  `;
+}
     });
   </script>
 
