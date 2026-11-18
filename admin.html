@@ -832,33 +832,34 @@ document.addEventListener('click', async e => {
   const editar = e.target.closest('[data-edit]');
   const apagar = e.target.closest('[data-delete]');
 
-if (editar) {
-  if (editar.dataset.type === 'individual') {
-    abrirIndividual(editar.dataset.edit);
-  } else {
-    abrir(editar.dataset.type,editar.dataset.edit);
+  if (editar) {
+    if (editar.dataset.type === 'individual') {
+      abrirIndividual(editar.dataset.edit);
+    } else {
+      abrir(editar.dataset.type, editar.dataset.edit);
+    }
   }
-});
 
   if (apagar) {
     const tipo = apagar.dataset.type;
+
     const tabela = {
-      curso:'courses',
-      modulo:'modules',
-      aula:'lessons',
-      material:'lesson_resources'
-      individual:'student_resources'
+      curso: 'courses',
+      modulo: 'modules',
+      aula: 'lessons',
+      material: 'lesson_resources',
+      individual: 'student_resources'
     }[tipo];
 
     const area = {
-      curso:'cursos',
-      modulo:'modulos',
-      aula:'aulas',
-      material:'materiais'
-      individual:'student_resources'
+      curso: 'cursos',
+      modulo: 'modulos',
+      aula: 'aulas',
+      material: 'materiais',
+      individual: 'individuais'
     }[tipo];
 
-    await excluir(tabela,apagar.dataset.delete,area);
+    await excluir(tabela, apagar.dataset.delete, area);
   }
 });
 
