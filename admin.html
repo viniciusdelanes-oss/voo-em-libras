@@ -788,7 +788,44 @@ $('form-material').onsubmit = async e => {
     resource_type: $('material-tipo').value
   },'materiais');
 };
+/* SALVAR MATERIAL INDIVIDUAL */
 
+$('form-individual').onsubmit = async e => {
+  e.preventDefault();
+
+  const id = $('individual-id').value;
+  const url = $('individual-url').value.trim();
+
+  if (!urlSegura(url)) {
+    mostrarStatus('individuais', 'Informe um endereço HTTP ou HTTPS válido.');
+    return;
+  }
+
+  const dados = {
+    student_id: $('individual-aluno').value,
+    title: $('individual-titulo').value.trim(),
+    file_url: url,
+    resource_type: $('individual-tipo').value
+  };
+
+  mostrarStatus('individuais', 'Salvando material...');
+
+  const resultado = id
+    ? await supabaseClient.from('student_resources').update(dados).eq('id', id)
+    : await supabaseClient.from('student_resources').insert(dados);
+
+  if (resultado.error) {
+    mostrarStatus('individuais', 'Erro ao salvar: ' + resultado.error.message);
+    return;
+  }
+
+  $('form-individual').reset();
+  $('form-individual').hidden = true;
+  $('individual-id').value = '';
+
+  await carregarTudo();
+  mostrarStatus('individuais', 'Material salvo com sucesso!');
+};
 /* EDITAR E EXCLUIR */
 
 document.addEventListener('click', async e => {
