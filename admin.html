@@ -263,6 +263,54 @@
       <p id="status-materiais" class="status" aria-live="polite"></p>
       <div id="lista-materiais"></div>
     </section>
+    <!-- MATERIAIS INDIVIDUAIS -->
+
+<section id="sec-individuais" class="admin-section" hidden>
+  <h2>Materiais individuais</h2>
+  <p>Envie materiais exclusivos para cada aluno.</p>
+
+  <button id="novo-individual" class="btn-primary">
+    + Novo material individual
+  </button>
+
+  <form id="form-individual" class="admin-form" hidden>
+    <h3 id="titulo-form-individual">Enviar material</h3>
+
+    <input type="hidden" id="individual-id">
+
+    <label>Aluno *
+      <select id="individual-aluno" required></select>
+    </label>
+
+    <label>Nome do material *
+      <input id="individual-titulo" required>
+    </label>
+
+    <label>Endereço do arquivo *
+      <input id="individual-url" type="url" required
+        placeholder="https://...">
+    </label>
+
+    <label>Tipo de material
+      <select id="individual-tipo">
+        <option value="pdf">PDF</option>
+        <option value="apostila">Apostila</option>
+        <option value="atividade">Atividade</option>
+        <option value="link">Link externo</option>
+        <option value="outro">Outro</option>
+      </select>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="btn-primary">Salvar material</button>
+      <button type="button" class="secondary"
+        data-cancel="individual">Cancelar</button>
+    </div>
+  </form>
+
+  <p id="status-individuais" class="status"></p>
+  <div id="lista-individuais"></div>
+</section>
 <!-- SOLICITAÇÕES DE PLANOS -->
 
 <section id="sec-solicitacoes" class="admin-section" hidden>
