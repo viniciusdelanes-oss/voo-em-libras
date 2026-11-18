@@ -695,7 +695,7 @@ $('novo-curso').onclick = () => abrir('curso');
 $('novo-modulo').onclick = () => abrir('modulo');
 $('nova-aula').onclick = () => abrir('aula');
 $('novo-material').onclick = () => abrir('material');
-
+$('novo-individual').onclick = () => abrirIndividual();
 document.querySelectorAll('[data-cancel]').forEach(botao => {
   botao.onclick = () => {
     const tipo = botao.dataset.cancel;
