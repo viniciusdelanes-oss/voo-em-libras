@@ -172,8 +172,7 @@
         await supabaseClient.auth.getUser();
 
       if (erroLogin || !user) {
-        alert('Faça login ou crie sua conta para solicitar a matrícula.');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html?next=planos.html';
         return;
       }
 
