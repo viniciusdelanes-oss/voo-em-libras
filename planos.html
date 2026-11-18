@@ -261,7 +261,18 @@
 lista.innerHTML = '';
     }
 
-    carregarPlanos();
+    async function iniciarPagina() {
+  const { data: { user }, error } = await supabaseClient.auth.getUser();
+
+  if (error || !user) {
+    window.location.href = 'login.html?next=planos.html';
+    return;
+  }
+
+  carregarPlanos();
+}
+
+iniciarPagina();
   </script>
 </body>
 </html>
