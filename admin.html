@@ -662,7 +662,33 @@ async function verificarAdministrador() {
   $('painel').hidden = false;
   await carregarTudo();
 }
+function abrirIndividual(id = '') {
+  const registro = id
+    ? estado.materiaisIndividuais.find(r => String(r.id) === String(id))
+    : null;
 
+  $('form-individual').reset();
+  $('individual-id').value = registro?.id || '';
+
+  opcoes('individual-aluno', estado.alunos, a =>
+    a.full_name || 'Aluno sem nome',
+    registro?.student_id || ''
+  );
+
+  $('individual-aluno').value = registro?.student_id || '';
+  $('individual-titulo').value = registro?.title || '';
+  $('individual-url').value = registro?.file_url || '';
+  $('individual-tipo').value = registro?.resource_type || 'pdf';
+
+  $('titulo-form-individual').textContent =
+    registro ? 'Editar material individual' : 'Enviar material';
+
+  $('form-individual').hidden = false;
+  $('form-individual').scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
 /* BOTÕES DE CADASTRO */
 
 $('novo-curso').onclick = () => abrir('curso');
