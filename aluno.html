@@ -66,6 +66,7 @@
       document.getElementById('boas-vindas').textContent =
         'Olá, ' + (perfil?.full_name || user.email) + '!';
 await carregarMatricula(user.id);
+      await carregarMateriais(user.id);
       const { data: matriculas, error: erroMatriculas } = await supabaseClient
         .from('subscriptions')
         .select('status, current_period_end, plan_id')
@@ -163,6 +164,162 @@ async function carregarMatricula(userId) {
       <p><strong>Solicitado em:</strong> ${new Date(pedido.created_at).toLocaleDateString('pt-BR')}</p>
     </article>
   `;
+}
+    async function carregarMateriais(userId) {
+  const container = document.getElementById('materiais-container');
+
+  const { data: matriculas, error } = await supabaseClient
+    .from('subscriptions')
+    .select('plan_id')
+    .eq('user_id', userId)
+    .eq('status', 'active');
+
+  if (error) {
+    container.textContent = 'Não foi possível carregar os materiais.';
+    console.error(error);
+    return;
+  }
+
+  const planos = [...new Set((matriculas || []).map(m => m.plan_id))];
+
+  if (!planos.length) {
+    container.textContent = 'Os materiais estarão disponíveis após a ativação da matrícula.';
+    return;
+  }
+
+  const { data: vinculos, error: erroVinculos } = await supabaseClient
+    .from('plan_courses')
+    .select('course_id, courses(title)')
+    .in('plan_id', planos);
+
+  if (erroVinculos) {
+    container.textContent = 'Não foi possível consultar seus cursos.';
+    console.error(erroVinculos);
+    return;
+  }
+
+  const cursoIds = [...new Set((vinculos || []).map(v => v.course_id))];
+
+  if (!cursoIds.length) {
+    container.textContent = 'Nenhum material disponível no momento.';
+    return;
+  }
+
+  const { data: modulos, error: erroModulos } = await supabaseClient
+    .from('modules')
+    .select('id, title, course_id')
+    .in('course_id', cursoIds);
+
+  if (erroModulos) {
+    container.textContent = 'Não foi possível carregar os módulos.';
+    console.error(erroModulos);
+    return;
+  }
+
+  const moduloIds = (modulos || []).map(m => m.id);
+
+  if (!moduloIds.length) {
+    container.textContent = 'Nenhum material disponível no momento.';
+    return;
+  }
+
+  const { data: aulas, error: erroAulas } = await supabaseClient
+    .from('lessons')
+    .select('id, title, module_id')
+    .in('module_id', moduloIds)
+    .eq('published', true);
+
+  if (erroAulas) {
+    container.textContent = 'Não foi possível carregar as aulas.';
+    console.error(erroAulas);
+    return;
+  }
+
+  const aulaIds = (aulas || []).map(a => a.id);
+
+  if (!aulaIds.length) {
+    container.textContent = 'Nenhum material disponível no momento.';
+    return;
+  }
+
+  const { data: materiais, error: erroMateriais } = await supabaseClient
+    .from('lesson_resources')
+    .select('title, file_url, resource_type, lesson_id')
+    .in('lesson_id', aulaIds);
+
+  if (erroMateriais) {
+    container.textContent = 'Não foi possível carregar os materiais.';
+    console.error(erroMateriais);
+    return;
+  }
+
+  const lista = materiais || [];
+
+  if (!lista.length) {
+    container.textContent = 'Ainda não há materiais publicados para seus cursos.';
+    return;
+  }
+
+  const cursos = vinculos || [];
+
+  container.innerHTML = cursos.map(vinculo => {
+    const cursoId = vinculo.course_id;
+
+    const modulosCurso = (modulos || []).filter(
+      m => m.course_id === cursoId
+    );
+
+    const conteudo = modulosCurso.map(modulo => {
+      const aulasModulo = (aulas || []).filter(
+        a => a.module_id === modulo.id
+      );
+
+      const conteudoAulas = aulasModulo.map(aula => {
+        const recursos = lista.filter(
+          r => r.lesson_id === aula.id
+        );
+
+        if (!recursos.length) return '';
+
+        return `
+          <div class="plan-card">
+            <h4>${escaparHTML(aula.title)}</h4>
+            ${recursos.map(recurso => {
+              let endereco = '';
+
+              try {
+                const url = new URL(recurso.file_url);
+                if (['https:', 'http:'].includes(url.protocol)) {
+                  endereco = url.href;
+                }
+              } catch {}
+
+              if (!endereco) return '';
+
+              return `
+                <p>
+                  <strong>${escaparHTML(recurso.resource_type || 'Material')}:</strong>
+                  <a href="${escaparHTML(endereco)}"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                    ${escaparHTML(recurso.title)}
+                  </a>
+                </p>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }).join('');
+
+      return conteudoAulas
+        ? `<div><h3>${escaparHTML(modulo.title)}</h3>${conteudoAulas}</div>`
+        : '';
+    }).join('');
+
+    return conteudo
+      ? `<div><h3>${escaparHTML(vinculo.courses?.title || 'Curso')}</h3>${conteudo}</div>`
+      : '';
+  }).join('') || '<p>Ainda não há materiais publicados para seus cursos.</p>';
 }
     function escaparHTML(valor) {
       return String(valor).replace(/[&<>"']/g, caractere => ({
