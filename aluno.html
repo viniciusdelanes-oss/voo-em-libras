@@ -60,7 +60,7 @@
 
       document.getElementById('boas-vindas').textContent =
         'Olá, ' + (perfil?.full_name || user.email) + '!';
-
+await carregarMatricula(user.id);
       const { data: matriculas, error: erroMatriculas } = await supabaseClient
         .from('subscriptions')
         .select('status, current_period_end, plan_id')
@@ -104,7 +104,61 @@
 
       carregarEncontros();
     }
+async function carregarMatricula(userId) {
+  const container = document.getElementById('matricula-container');
 
+  const { data: pedido, error } = await supabaseClient
+    .from('plan_requests')
+    .select('plan_id, status, modalidade, valor_mensal, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    container.textContent = 'Não foi possível consultar sua matrícula.';
+    console.error(error);
+    return;
+  }
+
+  if (!pedido) {
+    container.innerHTML = '<p>Você ainda não fez uma solicitação de matrícula.</p>';
+    return;
+  }
+
+  const { data: plano } = await supabaseClient
+    .from('plans')
+    .select('name')
+    .eq('id', pedido.plan_id)
+    .maybeSingle();
+
+  const situacoes = {
+    pending: 'Aguardando aprovação',
+    approved: 'Matrícula aprovada',
+    active: 'Matrícula ativa',
+    rejected: 'Solicitação não aprovada',
+    cancelled: 'Solicitação cancelada'
+  };
+
+  const modalidade = pedido.modalidade === 'individual'
+    ? 'Individual'
+    : 'Em grupo';
+
+  container.innerHTML = `
+    <article class="plan-card">
+      <h3>${escaparHTML(plano?.name || 'Plano solicitado')}</h3>
+      <p><strong>Modalidade:</strong> ${modalidade}</p>
+      <p><strong>Mensalidade:</strong> ${Number(pedido.valor_mensal).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      })}</p>
+      <p><strong>Situação:</strong> ${escaparHTML(
+        situacoes[pedido.status] || pedido.status
+      )}</p>
+      <p><strong>Solicitado em:</strong> ${new Date(pedido.created_at).toLocaleDateString('pt-BR')}</p>
+    </article>
+  `;
+}
     function escaparHTML(valor) {
       return String(valor).replace(/[&<>"']/g, caractere => ({
         '&': '&amp;',
