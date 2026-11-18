@@ -847,6 +847,7 @@ if (editar) {
       modulo:'modules',
       aula:'lessons',
       material:'lesson_resources'
+      individual:'student_resources'
     }[tipo];
 
     const area = {
@@ -854,6 +855,7 @@ if (editar) {
       modulo:'modulos',
       aula:'aulas',
       material:'materiais'
+      individual:'student_resources'
     }[tipo];
 
     await excluir(tabela,apagar.dataset.delete,area);
