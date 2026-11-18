@@ -754,10 +754,9 @@ document.querySelectorAll('[data-section]').forEach(botao => {
   botao.onclick = () => {
     const secao = botao.dataset.section;
 
-  ['cursos','modulos','aulas','materiais','solicitacoes'].forEach(nome => {
+  ['cursos','modulos','aulas','materiais','individuais','solicitacoes'].forEach(nome => {
   $('sec-' + nome).hidden = nome !== secao;
 });
-
     document.querySelectorAll('[data-section]').forEach(b => {
       b.classList.toggle('active',b === botao);
     });
