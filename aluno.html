@@ -6,6 +6,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Área do Aluno | Vôo em Libras</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+.material-card {
+  background: #fff;
+  border: 1px solid #eadff5;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 14px 0;
+  box-shadow: 0 6px 20px rgba(80, 56, 121, .07);
+}
+
+.material-card h4 {
+  color: #503879;
+  margin: 0 0 14px;
+}
+
+.material-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px;
+  margin-top: 10px;
+  background: #faf7fd;
+  border-radius: 10px;
+}
+
+.material-info {
+  color: #62566f;
+  font-weight: 600;
+}
+
+.material-link {
+  display: inline-block;
+  padding: 9px 17px;
+  border-radius: 22px;
+  background: #7256a5;
+  color: white !important;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.material-link:hover {
+  background: #503879;
+}
+
+@media (max-width: 480px) {
+  .material-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .material-link {
+    text-align: center;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -281,31 +339,50 @@ async function carregarMatricula(userId) {
 
         if (!recursos.length) return '';
 
-        return `
-          <div class="plan-card">
-            <h4>${escaparHTML(aula.title)}</h4>
-            ${recursos.map(recurso => {
-              let endereco = '';
+      return `
+  <div class="material-card">
+    <h4>${escaparHTML(aula.title)}</h4>
 
-              try {
-                const url = new URL(recurso.file_url);
-                if (['https:', 'http:'].includes(url.protocol)) {
-                  endereco = url.href;
-                }
-              } catch {}
+    ${recursos.map(recurso => {
+      let endereco = '';
 
-              if (!endereco) return '';
+      try {
+        const url = new URL(recurso.file_url);
+        if (['https:', 'http:'].includes(url.protocol)) {
+          endereco = url.href;
+        }
+      } catch {}
 
-              return `
-                <p>
-                  <strong>${escaparHTML(recurso.resource_type || 'Material')}:</strong>
-                  <a href="${escaparHTML(endereco)}"
-                     target="_blank"
-                     rel="noopener noreferrer">
-                    ${escaparHTML(recurso.title)}
-                  </a>
-                </p>
-              `;
+      if (!endereco) return '';
+
+      const tipo = recurso.resource_type || 'outro';
+
+      const icones = {
+        pdf: '📄',
+        apostila: '📚',
+        atividade: '📝',
+        link: '🔗',
+        outro: '📎'
+      };
+
+      return `
+        <div class="material-item">
+          <span class="material-info">
+            ${icones[tipo] || '📎'}
+            ${escaparHTML(recurso.title)}
+          </span>
+
+          <a class="material-link"
+             href="${escaparHTML(endereco)}"
+             target="_blank"
+             rel="noopener noreferrer">
+            Acessar material
+          </a>
+        </div>
+      `;
+    }).join('')}
+  </div>
+`;
             }).join('')}
           </div>
         `;
