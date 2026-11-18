@@ -223,14 +223,42 @@
         return;
       }
 
-      alert(
-        'Solicitação de matrícula registrada!\n\n' +
-        'Nível: ' + plano.name +
-        '\nModalidade: ' + (modalidade === 'individual' ? 'Individual' : 'Em grupo') +
-        '\nMensalidade: ' + formatarPreco(valor) +
-        '\n\nAguarde as instruções para pagamento via Pix. ' +
-        'O acesso será liberado após a confirmação.'
-      );
+  mensagem.innerHTML = `
+  <div style="
+    background: #f3f0ff;
+    padding: 25px;
+    border-radius: 16px;
+    margin-top: 20px;
+  ">
+    <h2 style="color: #3157a4;">Solicitação registrada!</h2>
+
+    <p><strong>Nível:</strong> ${escapar(plano.name)}</p>
+    <p><strong>Modalidade:</strong> ${modalidade === 'individual' ? 'Individual' : 'Em grupo'}</p>
+    <p><strong>Mensalidade:</strong> ${formatarPreco(valor)}</p>
+
+    <p>Agora você pode conversar diretamente com a professora Janisley pelo WhatsApp.</p>
+
+    <a
+      href="https://wa.me/5544998307145?text=${encodeURIComponent('Olá, Janis! Acabei de solicitar minha matrícula no site Vôo em Libras. Gostaria de conversar sobre as aulas.')}"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="
+        display: inline-block;
+        background: #25D366;
+        color: white;
+        padding: 14px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 10px;
+      "
+    >
+      Conversar com a Janis pelo WhatsApp
+    </a>
+  </div>
+`;
+
+lista.innerHTML = '';
     }
 
     carregarPlanos();
