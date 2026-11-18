@@ -339,7 +339,7 @@ async function carregarMatricula(userId) {
 
         if (!recursos.length) return '';
 
-      return `
+     return `
   <div class="material-card">
     <h4>${escaparHTML(aula.title)}</h4>
 
@@ -380,6 +380,9 @@ async function carregarMatricula(userId) {
           </a>
         </div>
       `;
+    }).join('')}
+  </div>
+`;
                }).join('');
 
       return conteudoAulas
