@@ -339,51 +339,51 @@ async function carregarMatricula(userId) {
 
         if (!recursos.length) return '';
 
-     return `
+const itensHTML = recursos.map(recurso => {
+  let endereco = '';
+
+  try {
+    const url = new URL(recurso.file_url);
+    if (['https:', 'http:'].includes(url.protocol)) {
+      endereco = url.href;
+    }
+  } catch {}
+
+  if (!endereco) return '';
+
+  const tipo = recurso.resource_type || 'outro';
+
+  const icones = {
+    pdf: '📄',
+    apostila: '📚',
+    atividade: '📝',
+    link: '🔗',
+    outro: '📎'
+  };
+
+  return `
+    <div class="material-item">
+      <span class="material-info">
+        ${icones[tipo] || '📎'}
+        ${escaparHTML(recurso.title)}
+      </span>
+
+      <a class="material-link"
+         href="${escaparHTML(endereco)}"
+         target="_blank"
+         rel="noopener noreferrer">
+        Acessar material
+      </a>
+    </div>
+  `;
+}).join('');
+
+return `
   <div class="material-card">
     <h4>${escaparHTML(aula.title)}</h4>
-
-    ${recursos.map(recurso => {
-      let endereco = '';
-
-      try {
-        const url = new URL(recurso.file_url);
-        if (['https:', 'http:'].includes(url.protocol)) {
-          endereco = url.href;
-        }
-      } catch {}
-
-      if (!endereco) return '';
-
-      const tipo = recurso.resource_type || 'outro';
-
-      const icones = {
-        pdf: '📄',
-        apostila: '📚',
-        atividade: '📝',
-        link: '🔗',
-        outro: '📎'
-      };
-
-      return `
-        <div class="material-item">
-          <span class="material-info">
-            ${icones[tipo] || '📎'}
-            ${escaparHTML(recurso.title)}
-          </span>
-
-          <a class="material-link"
-             href="${escaparHTML(endereco)}"
-             target="_blank"
-             rel="noopener noreferrer">
-            Acessar material
-          </a>
-        </div>
-      `;
-    }).join('')}
+    ${itensHTML}
   </div>
 `;
-               }).join('');
 
       return conteudoAulas
         ? `<div><h3>${escaparHTML(modulo.title)}</h3>${conteudoAulas}</div>`
